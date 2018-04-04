@@ -1,29 +1,7 @@
-# README #
+# Prosjekt 2 - IMT2291 - Våren 2018 #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Rediger readme filen og legg inn navnene på deltakerne på gruppen før dere begynner med noe annet :-).
 
-### What is this repository for? ###
+Beskrivelsen til oppgaven finnes i Wikien til det opprinnelige prosjektet ().
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Bruk Wikien til deres eget prosjekt til å dokumentere prosjektet slik det er beskrevet i oppgaven.
