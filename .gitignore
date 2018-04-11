@@ -1,5 +1,7 @@
-# Ignore temp directories
-bin/*
+# ignore environemnt specific files
+vendor/
+backend/config.php
+uploadedFiles/*
 build/*
 vendor/
 
