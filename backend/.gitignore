@@ -1,3 +1,20 @@
+
+# Ignore temp directories
+bin/*
+build/*
+
+# ignore environment specific stuff
+vendor/
+config.php
+uploadedFiles/*
+
+# ignore database stuff
+db_data/*
+
+# don't ignore gitkeep
+!.gitkeep
+
+
 # Ignore any build-files still roaming around
 *.exe
 *.out
