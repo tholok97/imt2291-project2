@@ -1,24 +1,28 @@
 #Get
 
-Call by going to "api/video/get.php".
+Call by going to "api/video/get.php" via GET-method.
 
-##Variables:
-"key": Our api key.
+##GET-method:
+
+###Variables:
+"auth": Our api key.
 "id": The id of our video.
 "increase" (optional): if we shall increase number of views or not (true/false). Default true.
 
-##Return
+###Return
 
-###Return statements if not error:
+Returns JSON.
+
+####Return statements if not error:
 "status": "ok",
 "errorMessage": null,
 "video": (array, see return example below)
 
-###Return statements if error is:
+####Return statements if error is:
 "status": "fail",
 "errorMessage": An errorMessage
 
-###Return example (if not error):
+####Return example (if not error):
 
 {
     "status": "ok",

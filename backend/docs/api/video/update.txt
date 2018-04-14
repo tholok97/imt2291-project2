@@ -1,0 +1,33 @@
+#Update
+
+Call by going to "api/video/update.php".
+
+##POST-method:
+
+###Variables:
+"auth": Our api key.
+"vid": The id of our video.
+"uid": The id of the user who uploaded it.
+"title": Video's new title.
+"description": Video's new description.
+"topic": Video's new topic.
+"course_code": Video's new course-code.
+
+###Return
+
+Returns JSON.
+
+####Return statements if not error:
+"status": "ok",
+"errorMessage": null,
+
+####Return statements if error is:
+"status": "fail",
+"errorMessage": An error-message
+
+####Return example (if not error):
+
+{
+    "status": "ok",
+    "errorMessage": null,
+}
