@@ -24,5 +24,11 @@ class Constants {
      */
     const RATING_MIN = 1;
     const RATING_MAX = 5;
+
+
+    /**
+     * API-constants
+     */
+    const API_KEY = "GGASSFWWDDSGhfgrGFsd";
     
 }
