@@ -1,7 +1,7 @@
 <?php
 /**
  * This script is used for getting a video.
- * If called with method POST and correct variables (see docs), you can update a video on our system.
+ * If called with method POST and correct variables (see docs), you can upload a video on our system.
  * 
  * We always need the variable 'auth' to be set with the correct key to be able to use the api.
  */
