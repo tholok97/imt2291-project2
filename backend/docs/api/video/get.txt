@@ -5,13 +5,12 @@ Call by going to "api/video/get.php".
 ##GET-method:
 
 ###Variables:
-"auth": Our api key.
 "vid": The id of our video.
 "increase" (optional): if we shall increase number of views or not (true/false). Default true.
 
 ###Return
 
-Returns JSON.
+Returns JSON with info about a video.
 
 ####Return statements if not error:
 "status": "ok",

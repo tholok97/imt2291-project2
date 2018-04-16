@@ -3,13 +3,14 @@
  * This script is used for rating a video.
  * If called with method POST and correct variables (see docs), you can add a comment to a video on our system.
  * 
- * We always need the variable 'auth' to be set with the correct key to be able to use the api.
+ * You need to be logged in (api/user/login.php) to use this.
  */
 
 require_once dirname(__FILE__) . '/../../config.php';
 require_once dirname(__FILE__) . '/../../src/constants.php';
 require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
 
+session_start();
 
 /*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
 header("Access-Control-Allow-Methods: POST");
@@ -23,22 +24,19 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($json->auth)                               // If correct variables is given.
-    && isset($json->vid)
-    && isset($json->uid)
-    && isset($json->text)) {
-    
-    if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
+if (isset($json->vid) && isset($json->rating)) {                             // If correct variables is given.
+    $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
+    if (isset($_SESSION['uid']) && $userManager->getUser(htmlspecialchars($_SESSION['uid']))['status'] == "ok") { // If logged in correctly.
         $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
         $result = $videoManager->addRating(                         // Rate a video.
             htmlspecialchars($json->rating),
-            htmlspecialchars($json->uid),
+            htmlspecialchars($_SESSION['uid']),
             htmlspecialchars($json->vid));
         
         echo json_encode($result);                          // Return.
     }
     else {                                          // If not correct api-key, give error.
-        echo json_encode(array("status" => "fail", "errorMessage" => "Not a correct api-key is given"));
+        echo json_encode(array("status" => "fail", "errorMessage" => "You are not logged in"));
     }
 }
 else {                                              // If not all variables is given, give error.

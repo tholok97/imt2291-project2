@@ -23,9 +23,9 @@ header("Content-Type: application/json; charset=utf-8");
 // Check if correct information is given:
 if (isset($_SESSION['uid'])) {                              // If correct variables is given.
     session_unset($_SESSION['uid']);
-    echo json_encode($result);                          // Return.
+    echo json_encode(array("status" => "ok"));                          // Return.
 }
 else {                                              // If not all variables is given, give error.
-    echo json_encode(array("status" => "fail", "message" => "Not all variables is given"));
+    echo json_encode(array("status" => "fail", "message" => "You are not logged in"));
 }
 ?>

@@ -1,14 +1,15 @@
-#Comment
+#addRating
 
-Call by going to "api/video/comment.php".
+Rate a video.
+
+Call by going to "api/video/addRating.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
     "vid": The id of our video.
-    "uid": The id of the user who uploaded it.
-    "text": The comment user wrote.
+    "rating": The rating (a number).
 }
 
 ###Return
@@ -18,6 +19,7 @@ Returns JSON.
 ####Return statements if not error:
 "status": "ok",
 "errorMessage": null,
+"cid": The id of the rating
 
 ####Return statements if error is:
 "status": "fail",
@@ -27,6 +29,6 @@ Returns JSON.
 
 {
     "status": "ok",
-    "cid": "8",
-    "errorMessage": null
+    "errorMessage": null,
+    "cid": "0"
 }

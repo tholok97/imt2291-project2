@@ -10,7 +10,6 @@ If both sending in GET and POST variables/JSON the GET variables will be used.
 
 ####JSON-variables:
 {
-    "auth": Our api key.
     "search": The string we search for.
     "options" (optionally): An object of where to search (see example below). Default is title and description.
 }
@@ -94,14 +93,13 @@ Returns JSON.
 ###Input:
 
 ####Variables:
-"auth": Our api key.
 "search": The string we search for.
 
 The options used when using get is title and description.
 
 ###Return
 
-Returns JSON.
+Returns JSON with the search result.
 
 ####Return statements if not error:
 "status": "ok",

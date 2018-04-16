@@ -5,12 +5,11 @@ Call by going to "api/video/getComments.php".
 ##GET-method:
 
 ###Variables:
-"auth": Our api key.
 "vid": The id of our video.
 
 ###Return
 
-Returns JSON.
+Returns JSON with all comments a video has.
 
 ####Return statements if not error:
 "status": "ok",
@@ -21,23 +20,59 @@ Returns JSON.
 "status": "fail",
 "errorMessage": An errorMessage
 
-####Return example (if not error):
+####Return example (if not error and at least one comment in database):
 
 {
     "status": "ok",
-    "errorMessage": null,
-    "video": {
-        "vid": "16",
-        "title": "Big buck bunny sample",
-        "description": "En video fra Blender",
-        "url": "uploadedFiles/1/videos/16",
-        "uid": "1",
-        "topic": "Videoer fra Blender foundation",
-        "course_code": "IMT2891",
-        "timestamp": "2018-02-06 10:00:31",
-        "view_count": 98,
-        "mime": "video/mp4",
-        "size": "4837755",
-        "position": null
-    }
+    "comments": [
+        {
+            "text": "This is a comment",
+            "cid": "8",
+            "vid": "3",
+            "uid": "1",
+            "timestamp": "2018-04-15 14:17:52",
+            "userInfo": {
+                "status": "ok",
+                "user": {
+                    "uid": "1",
+                    "username": "Ola65",
+                    "firstname": "Ola",
+                    "lastname": "Nordmann",
+                    "privilege_level": "2"
+                },
+                "message": ""
+            }
+        },
+        {
+            "cid": "9",
+            "vid": "3",
+            "uid": "1",
+            "text": "This is a comment 2",
+            "timestamp": "2018-04-15 14:41:55",
+            "userInfo": {
+                "status": "ok",
+                "user": {
+                    "uid": "1",
+                    "username": "Ola65",
+                    "firstname": "Ola",
+                    "lastname": "Nordmann",
+                    "privilege_level": "2"
+                },
+                "message": ""
+            }
+        }
+    ],
+    "errorMessage": null
+}
+
+####Return example (if not error and not any comments in database):
+
+{
+    "status": "ok",
+    "comments": [
+        {
+            "text": "Ingen kommentarer"
+        }
+    ],
+    "errorMessage": null
 }

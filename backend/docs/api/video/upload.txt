@@ -1,15 +1,22 @@
-#Comment
+#Upload
 
-Call by going to "api/video/comment.php".
+Uploads video.
+
+Call by going to "api/video/upload.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
     "vid": The id of our video.
-    "uid": The id of the user who uploaded it.
-    "text": The comment user wrote.
+    "title": Video's new title.
+    "description": Video's new description.
+    "topic": Video's new topic.
+    "course_code": Video's new course-code.
 }
+
+###Files:
+We need also the files 'video' and 'thumbnail'.
 
 ###Return
 
@@ -27,6 +34,5 @@ Returns JSON.
 
 {
     "status": "ok",
-    "cid": "8",
-    "errorMessage": null
+    "errorMessage": null,
 }

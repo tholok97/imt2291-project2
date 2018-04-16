@@ -3,13 +3,14 @@
  * This script is used for getting a video.
  * If called with method POST and correct variables (see docs), you can upload a video on our system.
  * 
- * We always need the variable 'auth' to be set with the correct key to be able to use the api.
+ * You need to be logged in (api/user/login.php) to use this.
  */
 
 require_once dirname(__FILE__) . '/../../config.php';
 require_once dirname(__FILE__) . '/../../src/constants.php';
 require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
 
+session_start();
 
 /*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
 header("Access-Control-Allow-Methods: POST");
@@ -23,30 +24,34 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($json->auth)                               // If correct variables is given.
-    && isset($json->uid)
-    && isset($json->title)
+if (isset($json->title)                               // If correct variables is given.
     && isset($json->description)
     && isset($json->topic)
     && isset($json->course_code)) {
     
     // Check if video is given:
     if (isset($_FILES['video']) && isset($_FILES['thumbnail'])) {
-        if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
-            $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
-            $result = $videoManager->upload()  (                            // Update video info.
-                htmlspecialchars($json->title),
-                htmlspecialchars($json->description),
-                htmlspecialchars($json->uid),
-                htmlspecialchars($json->topic),
-                htmlspecialchars($json->course_code),
-                htmlspecialchars($_FILES['video']),
-                htmlspecialchars($_FILES['thumbnail']));    
-            
-            echo json_encode($result);                          // Return.
+        if (isset($_SESSION['uid'])) {                                      // If logged in.
+            $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));  //Get info about user.
+            if ($user['status'] == "ok" && $user['privilege_level'] >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
+                $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
+                $result = $videoManager->upload()  (                            // Update video info.
+                    htmlspecialchars($json->title),
+                    htmlspecialchars($json->description),
+                    htmlspecialchars($_SESSION['uid']),
+                    htmlspecialchars($json->topic),
+                    htmlspecialchars($json->course_code),
+                    htmlspecialchars($_FILES['video']),
+                    htmlspecialchars($_FILES['thumbnail']));    
+                
+                echo json_encode($result);                          // Return.
+            }
+            else {
+                echo json_encode(array("status" => "fail", "errorMessage" => "You need to be privilege teacher or above to upload video"));
+            }
         }
         else {                                          // If not correct api-key, give error.
-            echo json_encode(array("status" => "fail", "errorMessage" => "Not a correct api-key is given"));
+            echo json_encode(array("status" => "fail", "errorMessage" => "You need to be logged in to upload video"));
         }
     }
     else {

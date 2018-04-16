@@ -5,12 +5,11 @@ Call by going to "api/video/GetAllUserVideos.php".
 ##GET-method:
 
 ###Variables:
-"auth": Our api key.
 "uid": The id of the user to get videos from.
 
 ###Return
 
-Returns JSON.
+Returns JSON with info about all users videos.
 
 ####Return statements if not error:
 "status": "ok",
