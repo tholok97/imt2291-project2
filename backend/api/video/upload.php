@@ -24,27 +24,33 @@ $json = json_decode($json_str);
 
 // Check if correct information is given:
 if (isset($json->auth)                               // If correct variables is given.
-    && isset($json->vid)
     && isset($json->uid)
     && isset($json->title)
     && isset($json->description)
     && isset($json->topic)
     && isset($json->course_code)) {
     
-    if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
-        $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
-        $result = $videoManager->update(                            // Update video info.
-            htmlspecialchars($json->vid),
-            htmlspecialchars($json->uid),
-            htmlspecialchars($json->title),
-            htmlspecialchars($json->description),
-            htmlspecialchars($json->topic),
-            htmlspecialchars($json->course_code));    
-        
-        echo json_encode($result);                          // Return.
+    // Check if video is given:
+    if (isset($_FILES['video']) && isset($_FILES['thumbnail'])) {
+        if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
+            $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
+            $result = $videoManager->upload()  (                            // Update video info.
+                htmlspecialchars($json->title),
+                htmlspecialchars($json->description),
+                htmlspecialchars($json->uid),
+                htmlspecialchars($json->topic),
+                htmlspecialchars($json->course_code),
+                htmlspecialchars($_FILES['video']),
+                htmlspecialchars($_FILES['thumbnail']));    
+            
+            echo json_encode($result);                          // Return.
+        }
+        else {                                          // If not correct api-key, give error.
+            echo json_encode(array("status" => "fail", "errorMessage" => "Not a correct api-key is given"));
+        }
     }
-    else {                                          // If not correct api-key, give error.
-        echo json_encode(array("status" => "fail", "errorMessage" => "Not a correct api-key is given"));
+    else {
+        echo json_encode(array("status" => "fail", "errorMessage" => "No video or thumbnail given"));
     }
 }
 else {                                              // If not all variables is given, give error.

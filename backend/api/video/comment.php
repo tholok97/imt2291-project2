@@ -1,7 +1,7 @@
 <?php
 /**
- * This script is used for getting a video.
- * If called with method POST and correct variables (see docs), you can update a video on our system.
+ * This script is used for comment on a video.
+ * If called with method POST and correct variables (see docs), you can add a comment to a video on our system.
  * 
  * We always need the variable 'auth' to be set with the correct key to be able to use the api.
  */
@@ -10,7 +10,6 @@ require_once dirname(__FILE__) . '/../../config.php';
 require_once dirname(__FILE__) . '/../../src/constants.php';
 require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
 
-session_start();
 
 /*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
 header("Access-Control-Allow-Methods: POST");
@@ -24,28 +23,23 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($_SESSION['uid'])
+if (isset($json->auth)                               // If correct variables is given.
     && isset($json->vid)
-    && isset($json->title)
-    && isset($json->description)
-    && isset($json->topic)
-    && isset($json->course_code)) {
+    && isset($json->uid)
+    && isset($json->text)) {
     
-    //if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
+    if (htmlspecialchars($json->auth) == Constants::API_KEY) { // If correct api-key is given.
         $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
-        $result = $videoManager->update(                            // Update video info.
-            htmlspecialchars($json->vid),
-            htmlspecialchars($_SESSION['uid']),
-            htmlspecialchars($json->title),
-            htmlspecialchars($json->description),
-            htmlspecialchars($json->topic),
-            htmlspecialchars($json->course_code));    
+        $result = $videoManager->comment(                       // Comment a video.
+            htmlspecialchars($json->text),
+            htmlspecialchars($json->uid),
+            htmlspecialchars($json->vid));
         
         echo json_encode($result);                          // Return.
-    /*}
+    }
     else {                                          // If not correct api-key, give error.
         echo json_encode(array("status" => "fail", "errorMessage" => "Not a correct api-key is given"));
-    }*/
+    }
 }
 else {                                              // If not all variables is given, give error.
     echo json_encode(array("status" => "fail", "errorMessage" => "Not all variables is given"));

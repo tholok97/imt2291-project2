@@ -1,6 +1,8 @@
-#Update
+#Search
 
 Call by going to "api/video/search.php".
+
+If both sending in GET and POST variables/JSON the GET variables will be used.
 
 ##POST-method:
 

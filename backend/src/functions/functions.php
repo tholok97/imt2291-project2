@@ -82,3 +82,46 @@ function buildWantsPrivilege($userManager) {
 
     return $ret;
 }
+
+//This function I have gotten from https://stackoverflow.com/questions/19361282/why-would-json-encode-return-an-empty-string
+function utf8ize($d) {
+    if (is_array($d)) {
+        foreach ($d as $k => $v) {
+            $d[$k] = utf8ize($v);
+        }
+    } else if (is_string ($d)) {
+        return utf8_encode($d);
+    }
+    return $d;
+}
+
+function utf8_converter($array)
+{
+    array_walk_recursive($array, function(&$item, $key){
+        if(!mb_detect_encoding($item, 'utf-8', true)){
+                $item = utf8_encode($item);
+        }
+    });
+ 
+    return $array;
+}
+
+
+
+function utf8_encode_deep(&$input) {
+    if (is_string($input)) {
+        $input = utf8_encode($input);
+    } else if (is_array($input)) {
+        foreach ($input as &$value) {
+            utf8_encode_deep($value);
+        }
+
+        unset($value);
+    } else if (is_object($input)) {
+        $vars = array_keys(get_object_vars($input));
+
+        foreach ($vars as $var) {
+            utf8_encode_deep($input->$var);
+        }
+    }
+}
