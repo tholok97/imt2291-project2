@@ -1,13 +1,13 @@
 <?php
 /**
- * This script is used for searching after videos.
- * If called with method GET and variable 'search' to get a list of possible videos, see docs for more info.
+ * This script is used for searching after users.
+ * If called with method GET and variable 'search' to get a list of possible users, see docs for more info.
  * If called with method POST and variable 'search' and an array 'options' to get a list of possible videos after a spesific criteria (options), see docs.
  */
 
 require_once dirname(__FILE__) . '/../../config.php';
 require_once dirname(__FILE__) . '/../../src/constants.php';
-require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
+require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
@@ -23,24 +23,24 @@ $json = json_decode($json_str);
 
 // Check if correct information is given:
 if (isset($_GET['search'])) {                // If correct variables is given.
-    $videoManager = new VideoManager(DB::getDBConnection());        // Start a new <videomanager-instance.
+    $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
         
     //Set some default options:
-    $options['title'] = true;
-    $options['description'] = true;
+    array_push($options,"firstname");
+    array_push($options,"lastname");
         
     $video = $videoManager->search(htmlspecialchars($_GET['search']));  // Get videos that matches the search-string.
     echo json_encode($video);                                                       // Return.
 }
 else if(isset($json->search)) {
-    $videoManager = new VideoManager(DB::getDBConnection());        // Start a new <videomanager-instance.
+    $videoManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
     $options = null;
     if (isset($json->options)) {                //If any options, send it in by typecasting.
         $options = (array) $json->options;
     }
     else {                                      //If not any options set, set a default value.
-        $options['title'] = true;
-        $options['description'] = true;
+        array_push($options,"firstname");
+        array_push($options,"lastname");
     }
 
     $video = $videoManager->search(htmlspecialchars($json->search),$options);  // Get videos that matches the search-string.

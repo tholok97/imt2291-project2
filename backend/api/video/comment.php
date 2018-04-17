@@ -28,7 +28,7 @@ if (isset($json->vid)                               // If correct variables is g
     && isset($json->text)) {
     
     $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-    if (isset($_SESSION['uid']) && $userManager->getUser(htmlspecialchars($_SESSION['uid']))['status'] == "ok") { // If logged in.
+    if (isset($_SESSION['uid']) && $userManager->isValidUser(htmlspecialchars($_SESSION['uid']))['valid']) { // If logged in.
         $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
         $result = $videoManager->comment(                       // Comment a video.
             htmlspecialchars($json->text),

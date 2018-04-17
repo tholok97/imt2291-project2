@@ -1,6 +1,6 @@
 <?php
 /**
- * This script is used for logging in on the system.
+ * This script is used for adding a new user to the system.
  * If called with method POST and correct variables (see docs), you can log in on the ststem.
  */
 
@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
+/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");
@@ -22,18 +22,19 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($json->username)                               // If correct variables is given.
-    && isset($json->password)) {
-    
-    $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-    $result = $userManager->login(                                 // Try to login.
-        htmlspecialchars($json->username),
-        htmlspecialchars($json->password));
-    
-    if($result['status'] == "ok") {                     // If logged in/possible to login, set session.
-        $_SESSION['uid'] = $result['uid'];
+if (isset($json->privilege) && isset($json->uid)) {                               // If correct variables is given.
+    if (isset($_SESSION['uid']) && $userManager->getUser(htmlspecialchars($_SESSION['uid']))['priviledge'] == 2) {
+        $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
+
+        $result = $userManager->grantPrivilegeLevel(   // Try to request another privilege to user.
+            htmlspecialchars($json->uid['uid']),
+            htmlspecialchars($json->privilege)
+        );
+        echo json_encode($result);                          // Return.
     }
-    echo json_encode($result);                          // Return.
+    else {
+        echo json_encode(array("status" => "fail", "message" => "You are not logged in"));
+    }
 }
 else {                                              // If not all variables is given, give error.
     echo json_encode(array("status" => "fail", "message" => "Not all variables is given"));

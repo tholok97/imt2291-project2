@@ -10,29 +10,20 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
-header("Access-Control-Allow-Methods: POST");
+/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
+header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");
 header("Content-Type: application/json; charset=utf-8");
 
-// Get json as string and convert it to a object:
-$json_str = file_get_contents('php://input');
-$json = json_decode($json_str);
-
 
 // Check if correct information is given:
-if (isset($json->username)                               // If correct variables is given.
-    && isset($json->password)) {
-    
+if (isset($_GET['uid'])) {                               // If correct variables is given.
+
     $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-    $result = $userManager->login(                                 // Try to login.
-        htmlspecialchars($json->username),
-        htmlspecialchars($json->password));
+        
+    $result = $userManager->isValidUser(htmlspecialchars($_GET['uid']));   // Check if user exist.
     
-    if($result['status'] == "ok") {                     // If logged in/possible to login, set session.
-        $_SESSION['uid'] = $result['uid'];
-    }
     echo json_encode($result);                          // Return.
 }
 else {                                              // If not all variables is given, give error.

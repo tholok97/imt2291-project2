@@ -26,7 +26,7 @@ $json = json_decode($json_str);
 // Check if correct information is given:
 if (isset($json->vid) && isset($json->rating)) {                             // If correct variables is given.
     $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-    if (isset($_SESSION['uid']) && $userManager->getUser(htmlspecialchars($_SESSION['uid']))['status'] == "ok") { // If logged in correctly.
+    if (isset($_SESSION['uid']) && $userManager->isValidUser(htmlspecialchars($_SESSION['uid']))['valid']) { // If logged in correctly.
         $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
         $result = $videoManager->addRating(                         // Rate a video.
             htmlspecialchars($json->rating),
