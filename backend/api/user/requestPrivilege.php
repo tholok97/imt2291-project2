@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
+header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");
@@ -23,8 +23,8 @@ $json = json_decode($json_str);
 
 // Check if correct information is given:
 if (isset($json->privilege)) {                               // If correct variables is given.
+    $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
     if (isset($_SESSION['uid']) && $userManager->isValidUser(htmlspecialchars($_SESSION['uid']))['valid']) {
-        $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
 
         $result = $userManager->requestPrivilege(   // Try to request another privilege to user.
             htmlspecialchars($_SESSION['uid']),

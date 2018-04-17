@@ -2,6 +2,8 @@
 
 Call by going to "api/video/update.php".
 
+You need to be logged in as teacher or admin to use this function.
+
 ##POST-method:
 
 ###JSON-variables:

@@ -1,6 +1,6 @@
 <?php
 /**
- * This script is used for logging in on the system.
+ * This script is used for checking if a user-id is valid.
  * If called with method POST and correct variables (see docs), you can log in on the ststem.
  */
 
@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
+header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");

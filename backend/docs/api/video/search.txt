@@ -1,4 +1,4 @@
-#Search
+#search
 
 Call by going to "api/video/search.php".
 

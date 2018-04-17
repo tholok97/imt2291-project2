@@ -4,6 +4,8 @@ Uploads video.
 
 Call by going to "api/video/upload.php".
 
+You need to be logged in as teacher or admin to use this function.
+
 ##POST-method:
 
 ###JSON-variables:

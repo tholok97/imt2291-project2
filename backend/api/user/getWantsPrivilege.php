@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
+header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");
@@ -20,9 +20,9 @@ header("Content-Type: application/json; charset=utf-8");
 // Check if only correct users:
 if (isset($_SESSION['uid'])) {                               // If correct variables is given.
     $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-    $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));
-    if ($user['status'] == "ok" && $user['privilege_level'] >= 2) {
-        $result = $userManager->getUser(htmlspecialchars($_GET['uid']));   // Get info about a user if user exist.
+    $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
+    if ($user['status'] == "ok" && $user['user']->privilege_level >= 2) {         // Check if logged in user can do this.
+        $result = $userManager->getWantsPrivilege();   // Get info about a user if user exist.
         
         echo json_encode($result);                          // Return.
     }

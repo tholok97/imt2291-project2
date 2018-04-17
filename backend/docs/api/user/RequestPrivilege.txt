@@ -1,8 +1,8 @@
-#addRating
+#requestPrivilege
 
-Rate a video.
+Ask an admin to get another privilege level to you.
 
-Call by going to "api/video/addRating.php".
+Call by going to "api/user/requestPrivilege.php".
 
 You need to be logged in to use this function.
 
@@ -10,8 +10,7 @@ You need to be logged in to use this function.
 
 ###JSON-variables:
 {
-    "vid": The id of our video.
-    "rating": The rating (a number).
+    "privilege": The privilege level you want.
 }
 
 ###Return
@@ -20,17 +19,15 @@ Returns JSON.
 
 ####Return statements if not error:
 "status": "ok",
-"errorMessage": null,
-"cid": The id of the rating
+"message": "",
 
 ####Return statements if error is:
 "status": "fail",
-"errorMessage": An error-message
+"message": An error-message
 
 ####Return example (if not error):
 
 {
     "status": "ok",
-    "errorMessage": null,
-    "cid": "0"
+    "message": ""
 }

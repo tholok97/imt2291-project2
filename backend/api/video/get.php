@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
 
 session_start();
 
-//header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);
+header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");

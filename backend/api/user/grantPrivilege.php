@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../../src/classes/UserManager.php';
 
 session_start();
 
-/*header("Access-Control-Allow-Origin: ".$config['AccessControlAllowOrigin']);*/
+header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin");
@@ -23,14 +23,19 @@ $json = json_decode($json_str);
 
 // Check if correct information is given:
 if (isset($json->privilege) && isset($json->uid)) {                               // If correct variables is given.
-    if (isset($_SESSION['uid']) && $userManager->getUser(htmlspecialchars($_SESSION['uid']))['priviledge'] == 2) {
+    if (isset($_SESSION['uid'])) {
         $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-
-        $result = $userManager->grantPrivilegeLevel(   // Try to request another privilege to user.
-            htmlspecialchars($json->uid['uid']),
-            htmlspecialchars($json->privilege)
-        );
-        echo json_encode($result);                          // Return.
+        $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
+        if ($user['status'] == "ok" && $user['user']->privilege_level >= 2) {         // Check if logged in user can do this.
+            $result = $userManager->grantPrivilege(                             // Try to request another privilege to user.
+                htmlspecialchars($json->uid),
+                htmlspecialchars($json->privilege)
+            );
+            echo json_encode($result);                          // Return.
+        }
+        else {                                                  // If not priviledged enough or not correct uid.
+            echo json_encode(array("status" => "fail", "message" => "You are not logged in with a priviledged enough user"));
+        }
     }
     else {
         echo json_encode(array("status" => "fail", "message" => "You are not logged in"));
