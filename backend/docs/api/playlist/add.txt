@@ -1,0 +1,37 @@
+#add
+
+Add a new playlist.
+
+Call by going to "api/playlist/add.php".
+
+##POST-method:
+
+###JSON-variables:
+{
+    "title": The playlists title.
+    "description": The password.
+}
+
+###Files:
+We also need the file 'thumbnail'.
+
+###Return
+
+Returns JSON.
+
+####Return statements if not error:
+"status": "ok",
+"uid": User id of the new user,
+"message": "",
+
+####Return statements if error is:
+"status": "fail",
+"message": An error-message
+
+####Return example (if not error):
+
+{
+    "status": "ok",
+    "message": "",
+    "uid": "4"
+}

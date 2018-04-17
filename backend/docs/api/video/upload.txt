@@ -18,7 +18,7 @@ You need to be logged in as teacher or admin to use this function.
 }
 
 ###Files:
-We need also the files 'video' and 'thumbnail'.
+We also need the files 'video' and 'thumbnail'.
 
 ###Return
 

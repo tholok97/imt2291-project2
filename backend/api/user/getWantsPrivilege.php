@@ -1,7 +1,7 @@
 <?php
 /**
- * This script is used for getting the info of a user on the system.
- * If called with method POST and correct variables (see docs), you can log in on the ststem.
+ * This script is used for getting the persons who want another privilege.
+ * If called with method GET and correct variables (see docs), you can get this info.
  */
 
 require_once dirname(__FILE__) . '/../../config.php';
@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../../src/functions/functions.php';
 
 session_start();
 
-setApiHeaders();
+setApiHeaders("GET");
 
 
 // Check if only correct users:

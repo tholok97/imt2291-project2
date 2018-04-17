@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . '/../../src/functions/functions.php';
 
 session_start();
 
-setApiHeaders();
+setApiHeaders("GET");
 
 // Check if correct information is given:
 if (isset($_GET['uid'])) {                // If correct variables is given.

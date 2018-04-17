@@ -1,7 +1,7 @@
 <?php
 /**
- * This script is used for rating a video.
- * If called with method POST and correct variables (see docs), you can add a comment to a video on our system.
+ * This script is used logging out.
+ * If called with method GET and correct variables (see docs), you can log out.
  * 
  * We always need the variable 'auth' to be set with the correct key to be able to use the api.
  */
@@ -13,7 +13,7 @@ require_once dirname(__FILE__) . '/../../src/functions/functions.php';
 
 session_start();
 
-setApiHeaders();
+setApiHeaders("GET");
 
 
 

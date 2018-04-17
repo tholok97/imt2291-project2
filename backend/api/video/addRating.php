@@ -13,7 +13,7 @@ require_once dirname(__FILE__) . '/../../src/functions/functions.php';
 
 session_start();
 
-setApiHeaders();
+setApiHeaders("POST");
 
 // Get json as string and convert it to a object:
 $json_str = file_get_contents('php://input');

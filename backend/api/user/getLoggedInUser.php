@@ -1,7 +1,7 @@
 <?php
 /**
- * This script is used for checking if a user-id is valid.
- * If called with method GET and correct variables (see docs), you can check this.
+ * This script is used for checking if logged in and get that info.
+ * If called with method GET and correct variables (see docs), you can see if you are logged in.
  */
 
 require_once dirname(__FILE__) . '/../../config.php';
@@ -15,15 +15,13 @@ setApiHeaders("GET");
 
 
 // Check if correct information is given:
-if (isset($_GET['uid'])) {                               // If correct variables is given.
-
+if (isset($_SESSION['uid'])) {                               // If correct variables is given.
     $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
-        
-    $result = $userManager->isValidUser(htmlspecialchars($_GET['uid']));   // Check if user exist.
+    $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
     
-    echo json_encode($result);                          // Return.
+    echo json_encode($user);                          // Return.
 }
 else {                                              // If not all variables is given, give error.
-    echo json_encode(array("status" => "fail", "message" => "Not all variables is given"));
+    echo json_encode(array("status" => "fail", "message" => "You are not logged in."));
 }
 ?>
