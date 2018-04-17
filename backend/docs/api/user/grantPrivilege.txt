@@ -10,6 +10,7 @@ You need to be logged in as admin to use this function.
 
 ###JSON-variables:
 {
+    "uid": The user id to person to grant it to.
     "privilege": The privilege level you want.
 }
 

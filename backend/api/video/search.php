@@ -8,14 +8,11 @@
 require_once dirname(__FILE__) . '/../../config.php';
 require_once dirname(__FILE__) . '/../../src/constants.php';
 require_once dirname(__FILE__) . '/../../src/classes/VideoManager.php';
+require_once dirname(__FILE__) . '/../../src/functions/functions.php';
 
 session_start();
 
-header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
-header("Access-Control-Allow-Methods: GET, POST");
-header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Headers: Origin");
-header("Content-Type: application/json; charset=utf-8");
+setApiHeaders();
 
 // Get json as string and convert it to a object:
 $json_str = file_get_contents('php://input');
