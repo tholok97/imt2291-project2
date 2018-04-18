@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">          
 <link rel="import" href="../bower_components/simple-dropdown/simple-dropdown.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="my-icons.html">                                           
 <link rel="import" href="../my-components/user-login/user-login.html">                                  
 
@@ -82,6 +83,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </style>
 
+        <!-- request to see if user is logged in or not -->
+        <iron-ajax
+            auto
+            id="checkUserAjax"
+            with-credentials="true"
+            url="[[getLoggedInUserURL]]"
+            method="get"
+            handle-as="json"
+            on-response="handleCheckUserResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
         <app-location
             route="{{route}}"
             url-space-regex="^[[rootPath]]">
@@ -115,7 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                         <!-- dropdown with login / logout (plus any personal information potentially -->
                         <simple-dropdown position="bottom right" icon="icons:account-box" no-icon-rotate="false" no-blur="false">
-                            <user-login page-changed="_changePage"></user-login>
+                            <user-login user="{{user}}" page-changed="_changePage"></user-login>
                         </simple-dropdown>
                     </app-toolbar>
                 </app-header>
@@ -154,6 +167,15 @@ class MyApp extends Polymer.Element {
             // This shouldn't be neccessary, but the Analyzer isn't picking up
             // Polymer.Element#rootPath
             rootPath: String,
+            // where is the logout API?
+            getLoggedInUserURL : {                                  
+                type: String,
+                value: window.Polymer.apiBaseURL+'user/getLoggedInUser.php'
+            },
+            user: {
+                type: String,
+                value: 'waiting'
+            }
         };
     }
 
@@ -186,6 +208,19 @@ class MyApp extends Polymer.Element {
 
     _showPage404() {
         this.page = 'view404';
+    }
+
+    /*
+     * if user is logged in -> store in this.user
+     * if not -> store 'notLoggedIn'
+     */
+    handleCheckUserResponse(res) {
+        if (res.detail.response.status == 'ok') {
+            this.user = res.detail.response.user;
+        } else {
+            this.user = 'notLoggedIn';
+        }
+        console.log(res.detail.response); // DEBUG
     }
 }
 

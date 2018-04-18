@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="user-login">
     <template>
@@ -45,18 +46,26 @@
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
-        <!-- shown if user not logged in -->
-        <template is="dom-if" if="[[!loggedIn]]">
-            <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
-            <paper-input id="password" label="Passord" value="{{password}}"></paper-input>
-            <paper-button raised on-click="login">Logg inn</paper-button>
+        <!-- shown while waiting to load -->
+        <template is="dom-if" if="[[isWaiting(user)]]">
+            <paper-spinner active></paper-spinner>
         </template>
 
-        <!-- shown if user logged in -->
-        <template is="dom-if" if="{{loggedIn}}">
-            Velkommen [[userDetails.username]]<br>
-            <paper-button raised on-click="profile">Min profil</paper-button>
-            <paper-button raised on-click="logout">Logg ut</paper-button>
+        <template is="dom-if" if="[[!isWaiting(user)]]">
+
+            <!-- shown if user not logged in -->
+            <template is="dom-if" if="[[!isLoggedIn(user)]]">
+                <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
+                <paper-input id="password" label="Passord" value="{{password}}"></paper-input>
+                <paper-button raised on-click="login">Logg inn</paper-button>
+            </template>
+
+            <!-- shown if user logged in -->
+            <template is="dom-if" if="{{isLoggedIn(user)}}">
+                Du er logget inn som [[user.firstname]] [[user.lastname]]<br>
+                <br>
+                <paper-button raised on-click="logout">Logg ut</paper-button>
+            </template>
         </template>
     </template>
 
@@ -89,7 +98,11 @@ class UserLogin extends Polymer.Element {
                 value: false
             },
             username: String,                            
-            password: String
+            password: String,
+            user: {
+                type: Object,
+                value: "waiting"
+            }
         };
     }
 
@@ -115,7 +128,7 @@ class UserLogin extends Polymer.Element {
      */
     handleLoginResponse(res) {
         if (res.detail.response.status == 'ok') {
-            this.loggedIn = true;
+            this.user = res.detail.response.user;
         }
         console.log(res.detail.response)  // DEBUG
     }
@@ -125,9 +138,23 @@ class UserLogin extends Polymer.Element {
      */
     handleLogoutResponse(res) {
         if (res.detail.response.status == 'ok') {
-            this.loggedIn = false;
+            this.user = 'notLoggedIn';
         }
         console.log(res.detail.response);   // DEBUG
+    }
+
+    /*
+     * is the given user logged in?
+     */
+    isLoggedIn(user) {
+        return user != "waiting" && user != 'notLoggedIn';
+    }
+
+    /*
+     * is the given user in waiting state? (waiting for answer from server)
+     */
+    isWaiting(user) {
+        return user == "waiting" && user != 'notLoggedIn';
     }
 }
 
