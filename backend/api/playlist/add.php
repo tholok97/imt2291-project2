@@ -32,9 +32,21 @@ if (isset($json->title)                               // If correct variables is
             $result = $playlistManager->addPlaylist(                            // Add a new playlist.
                 htmlspecialchars($json->title),
                 htmlspecialchars($json->description),
-                $_FILES['thumbnail']);
+                $_FILES['thumbnail']
+            );
     
-            echo json_encode($result);                          // Return.
+            $result2 = null;
+            // If result ok, add user as maintainer.
+            if ($result['status'] == "ok") {
+                $result2 = $playlistManager->addMaintainerToPlaylist(
+                    htmlspecialchars($_SESSION['uid']),
+                    htmlspecialchars($json->pid)
+                );
+            }
+            
+            $totalResult['addPlaylist'] = $result;
+            $totalResult['addMaintainer'] = $result2;
+            echo json_encode($totalResult);                          // Return.
         }
         else {                                              // If not teacher or above, give error.
             echo json_encode(array("status" => "fail", "message" => "You are not privileged to do this"));

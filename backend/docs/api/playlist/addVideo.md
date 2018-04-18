@@ -1,15 +1,15 @@
-#login
+#addVideo
 
-Login on the system.
+Add a video to playlist.
 
-Call by going to "api/user/login.php".
+Call by going to "api/playlist/addVideo.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
-    "username": The username.
-    "password": The password.
+    "vid": The video id of the video to add.
+    "pid": The playlist id.
 }
 
 ###Return
@@ -18,8 +18,7 @@ Returns JSON.
 
 ####Return statements if not error:
 "status": "ok",
-"message": null,
-"uid": The user id of the just signed in user
+"message": "",
 
 ####Return statements if error is:
 "status": "fail",
@@ -29,6 +28,5 @@ Returns JSON.
 
 {
     "status": "ok",
-    "uid": "1",
-    "message": "test"
+    "message": ""
 }

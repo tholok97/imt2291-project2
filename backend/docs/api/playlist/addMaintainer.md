@@ -1,19 +1,16 @@
-#add
+#addMaintainer
 
-Add a new playlist.
+Add a new maintainer to playlist.
 
-Call by going to "api/playlist/add.php".
+Call by going to "api/playlist/addMaintainer.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
-    "title": The playlists title.
-    "description": The password.
+    "uid": The user id of the user to add.
+    "pid": The playlist id.
 }
-
-###Files:
-We also need the file 'thumbnail'.
 
 ###Return
 
@@ -21,7 +18,6 @@ Returns JSON.
 
 ####Return statements if not error:
 "status": "ok",
-"uid": User id of the new user,
 "message": "",
 
 ####Return statements if error is:
@@ -32,6 +28,5 @@ Returns JSON.
 
 {
     "status": "ok",
-    "message": "",
-    "uid": "4"
+    "message": ""
 }

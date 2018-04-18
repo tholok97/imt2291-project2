@@ -29,8 +29,12 @@ if (isset($json->username)                               // If correct variables
     
     if($result['status'] == "ok") {                     // If logged in/possible to login, set session.
         $_SESSION['uid'] = $result['uid'];
+        $user = $userManager->getUser($result['uid']);
+        echo json_encode($user);                            // If ok on login, return a user object.
     }
-    echo json_encode($result);                          // Return.
+    else {
+        echo json_encode($result);                          // Return if not ok here.
+    }
 }
 else {                                              // If not all variables is given, give error.
     echo json_encode(array("status" => "fail", "message" => "Not all variables is given"));
