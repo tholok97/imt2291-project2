@@ -11,7 +11,7 @@ If both sending in GET and POST variables/JSON the GET variables will be used.
 ####JSON-variables:
 {
     "search": The string we search for.
-    "options" (optionally): An array of where to search (see example below). Default is title and description.
+    "options" (optionally): An array of where to search (see example below). Default is firstname and lastname.
 }
 
 ####Input-example (with all options enabled):
@@ -52,7 +52,7 @@ Returns JSON.
 ####Variables:
 "search": The string we search for.
 
-The options used when using get is title and description.
+The options used when using get is firstname and lastname.
 
 ###Return
 

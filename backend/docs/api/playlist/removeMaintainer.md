@@ -1,16 +1,14 @@
-#addMaintainer
+#removeMaintainer
 
-Add a new maintainer to playlist.
+Remove a maintainer from playlist.
 
-Call by going to "api/playlist/addMaintainer.php".
-
-You need to be signed in with correct user.
+Call by going to "api/playlist/removeMaintainer.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
-    "uid": The user id of the user to add.
+    "uid": The user id of user to remove.
     "pid": The playlist id.
 }
 
@@ -20,7 +18,7 @@ Returns JSON.
 
 ####Return statements if not error:
 "status": "ok",
-"message": ""
+"message": "",
 
 ####Return statements if error is:
 "status": "fail",

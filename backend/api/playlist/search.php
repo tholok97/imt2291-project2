@@ -25,7 +25,7 @@ if (isset($_GET['search'])) {                // If correct variables is given.
     //Set some default options:
     $options = ['title', 'description'];
         
-    $playlists = $playlistManager->searchPlaylistsMultipleFields(htmlspecialchars($_GET['search']));  // Get videos that matches the search-string.
+    $playlists = $playlistManager->searchPlaylistsMultipleFields(htmlspecialchars($_GET['search']), $options);  // Get videos that matches the search-string.
     echo json_encode($playlists);                                                       // Return.
 }
 else if(isset($json->search)) {

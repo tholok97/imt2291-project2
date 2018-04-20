@@ -1,18 +1,16 @@
-#addMaintainer
+#subscribe
 
-Add a new maintainer to playlist.
+Subscribe to playlist.
 
-Call by going to "api/playlist/addMaintainer.php".
+Call by going to "api/playlist/subscribe.php".
 
-You need to be signed in with correct user.
+You need to be signed in.
 
-##POST-method:
+##GET-method:
 
-###JSON-variables:
-{
-    "uid": The user id of the user to add.
-    "pid": The playlist id.
-}
+###Variables:
+
+"pid": The playlist to subscribe to.
 
 ###Return
 

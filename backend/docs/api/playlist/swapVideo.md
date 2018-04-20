@@ -1,16 +1,15 @@
-#addMaintainer
+#swapVideo
 
-Add a new maintainer to playlist.
+Swap videos in playlist.
 
-Call by going to "api/playlist/addMaintainer.php".
-
-You need to be signed in with correct user.
+Call by going to "api/playlist/swapVideo.php".
 
 ##POST-method:
 
 ###JSON-variables:
 {
-    "uid": The user id of the user to add.
+    "pos1": Video-position 1 in playlist.
+    "pos2": Video-position 2 in playlist.
     "pid": The playlist id.
 }
 
@@ -20,7 +19,7 @@ Returns JSON.
 
 ####Return statements if not error:
 "status": "ok",
-"message": ""
+"message": "",
 
 ####Return statements if error is:
 "status": "fail",

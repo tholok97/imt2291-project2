@@ -1,14 +1,16 @@
-#getNextPosition
+#isSubscribed
 
-Get next position in a playlist.
+Get all playlists user maintains.
 
-Call by going to "api/playlist/getNextPosition.php".
+Call by going to "api/playlist/getUserMaintains.php".
+
+You need to be signed in.
 
 ##GET-method:
 
 ###Variables:
 
-"pid": The playlist id of the playlist to get.
+"pid": The playlist to check up to.
 
 ###Return
 
@@ -17,7 +19,7 @@ Returns JSON.
 ####Return statements if not error:
 "status": "ok",
 "message": "",
-"position": Position.
+"subscribed": true/false
 
 ####Return statements if error is:
 "status": "fail",
@@ -28,5 +30,5 @@ Returns JSON.
 {
     "status": "ok",
     "message": "",
-    "position": 4
+    "subscribed": "true"
 }

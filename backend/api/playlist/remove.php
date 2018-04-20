@@ -19,9 +19,7 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($json->uid)                               // If correct variables is given.
-    && isset($json->pid)) {
-
+if (isset($json->pid)) {                               // If correct variables is given.
     if (isset($_SESSION['uid'])) {                              // Check if logged in.
         $playlistManager = new PlaylistManager(DB::getDBConnection());          // Get a new Playlistmanager
         
