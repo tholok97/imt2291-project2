@@ -602,6 +602,7 @@ class VideoManager {
                 $ret['status'] = 'ok';
                 $ret['rating'] = htmlspecialchars($row['rating']);
                 $ret['numberOfRatings'] = htmlspecialchars($row['numberOfRatings']);
+                $ret['errorMessage'] = "";
             }
         } catch (PDOException $ex) {
             $ret['errorMessage'] = "Problemer med å bruke databasen, prøv igjen senere eller kontakt administrator.";//$ex->getMessage();

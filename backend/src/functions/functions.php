@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__FILE__) . '/../../config.php';
+
 /**
  * Get a timestamp of current time in Oslo, Norway.
  * 
@@ -81,4 +83,12 @@ function buildWantsPrivilege($userManager) {
     }
 
     return $ret;
+}
+
+function setApiHeaders($method) {
+    header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
+    header("Access-Control-Allow-Methods: ".$method);
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Headers: Origin, Content-Type");
+    header("Content-Type: application/json; charset=utf-8");
 }

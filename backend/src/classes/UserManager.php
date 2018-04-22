@@ -180,8 +180,9 @@ class UserManager {
             $stmt->bindParam(':uid', $uid);
 
             if ($stmt->execute()) {
-                
+                $ret['status'] = 'ok';
                 if (count($stmt->fetchAll()) > 0) {
+                    $ret['status'] = 'ok';
                     $ret['valid'] = true; 
                 } else {
                     $ret['valid'] = false;
