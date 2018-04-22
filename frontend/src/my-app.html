@@ -120,9 +120,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <a name="search" href="[[rootPath]]search">Avansert søk</a>
                     <a name="allvideos" href="[[rootPath]]allvideos">Alle videoer</a>
                     <a name="allplaylists" href="[[rootPath]]allplaylists">Alle spillelister</a>
-                    <a name="uploadvideo" href="[[rootPath]]uploadvideo">Last opp video</a>
-                    <a name="newplaylist" href="[[rootPath]]newplaylist">Ny spilleliste</a>
-                    <a name="admin" href="[[rootPath]]admin">Admin side</a>
+
+
+                    <template is="dom-if" if="[[isLecturer]]">
+                        <a name="uploadvideo" href="[[rootPath]]uploadvideo">Last opp video</a>
+                        <a name="newplaylist" href="[[rootPath]]newplaylist">Ny spilleliste</a>
+                    </template>
+
+                    <template is="dom-if" if="[[isAdmin]]">
+                        <a name="admin" href="[[rootPath]]admin">Admin side</a>
+                    </template>
                 </iron-selector>
             </app-drawer>
 
@@ -161,81 +168,99 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
         // Gesture events like tap and track generated from touch will not be
-// preventable, allowing for better scrolling performance.
-Polymer.setPassiveTouchGestures(true);
+                            // preventable, allowing for better scrolling performance.
+                            Polymer.setPassiveTouchGestures(true);
 
-class MyApp extends Polymer.Element {
-    static get is() { return 'my-app'; }
+                            class MyApp extends Polymer.Element {
+                                static get is() { return 'my-app'; }
 
-    static get properties() {
-        return {
-            page: {
-                type: String,
-                reflectToAttribute: true,
-                observer: '_pageChanged',
-            },
-            routeData: Object,
-            subroute: Object,
-            // This shouldn't be neccessary, but the Analyzer isn't picking up
-            // Polymer.Element#rootPath
-            rootPath: String,
-            // where is the logout API?
-            getLoggedInUserURL : {                                  
-                type: String,
-                value: window.Polymer.apiBaseURL+'user/getLoggedInUser.php'
-            },
-            user: {
-                type: String,
-                value: 'waiting'
-            }
-        };
-    }
+                                static get properties() {
+                                    return {
+                                        page: {
+                                            type: String,
+                                            reflectToAttribute: true,
+                                            observer: '_pageChanged',
+                                        },
+                                        routeData: Object,
+                                        subroute: Object,
+                                        // This shouldn't be neccessary, but the Analyzer isn't picking up
+                                        // Polymer.Element#rootPath
+                                        rootPath: String,
+                                        // where is the logout API?
+                                        getLoggedInUserURL : {                                  
+                                            type: String,
+                                            value: window.Polymer.apiBaseURL+'user/getLoggedInUser.php'
+                                        },
+                                        user: {
+                                            type: String,
+                                            value: 'waiting',
+                                            observer: 'updatePrivilege'
+                                        },
+                                        isLecturer: {
+                                            type: Boolean,
+                                            value: false
+                                        },
+                                        isAdmin: {
+                                            type: Boolean,
+                                            value: false
+                                        },
+                                    };
+                                }
 
-    static get observers() {
-        return [
-            '_routePageChanged(routeData.page)',
-        ];
-    }
+                                static get observers() {
+                                    return [
+                                        '_routePageChanged(routeData.page)',
+                                    ];
+                                }
 
-    _routePageChanged(page) {
-        // If no page was found in the route data, page will be an empty string.
-        // Default to 'view1' in that case.
-        this.page = page || 'view1';
+                                _routePageChanged(page) {
+                                    // If no page was found in the route data, page will be an empty string.
+                                    // Default to 'view1' in that case.
+                                    this.page = page || 'view1';
 
-        // Close a non-persistent drawer when the page & route are changed.
-        if (!this.$.drawer.persistent) {
-            this.$.drawer.close();
-        }
-    }
+                                    // Close a non-persistent drawer when the page & route are changed.
+                                    if (!this.$.drawer.persistent) {
+                                        this.$.drawer.close();
+                                    }
+                                }
 
-    _pageChanged(page) {
-        // Load page import on demand. Show 404 page if fails
-        const resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
-        Polymer.importHref(
-            resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
-    }
+                                _pageChanged(page) {
+                                    // Load page import on demand. Show 404 page if fails
+                                    const resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+                                    Polymer.importHref(
+                                        resolvedPageUrl,
+                                        null,
+                                        this._showPage404.bind(this),
+                                        true);
+                                }
 
-    _showPage404() {
-        this.page = 'view404';
-    }
+                                _showPage404() {
+                                    this.page = 'view404';
+                                }
 
-    /*
-     * if user is logged in -> store in this.user
-     * if not -> store 'notLoggedIn'
-     */
-    handleCheckUserResponse(res) {
-        if (res.detail.response.status == 'ok') {
-            this.user = res.detail.response.user;
-        } else {
-            this.user = 'notLoggedIn';
-        }
-        console.log(res.detail.response); // DEBUG
-    }
-}
+                                /*
+                                 * if user is logged in -> store in this.user
+                                 * if not -> store 'notLoggedIn'
+                                 */
+                                handleCheckUserResponse(res) {
+                                    if (res.detail.response.status == 'ok') {
+                                        this.user = res.detail.response.user;
+                                    } else {
+                                        this.user = 'notLoggedIn';
+                                    }
+                                    console.log(res.detail.response); // DEBUG
+                                }
 
-window.customElements.define(MyApp.is, MyApp);
-</script>
-</dom-module>
+                                /*
+                                 * Update privilege variables based on privilege level
+                                 */ 
+                                updatePrivilege() {
+                                    console.log("updating privilege") // DEBUG
+                                    this.isLecturer = (this.user.privilege_level >= 1);
+                                    this.isAdmin = (this.user.privilege_level >= 2);
+                                }
+                            }
+
+                            window.customElements.define(MyApp.is, MyApp);
+                        </script>
+                    </dom-module>

@@ -101,7 +101,8 @@ class UserLogin extends Polymer.Element {
             password: String,
             user: {
                 type: Object,
-                value: "waiting"
+                value: "waiting",
+                notify: true
             }
         };
     }
@@ -156,6 +157,7 @@ class UserLogin extends Polymer.Element {
     isWaiting(user) {
         return user == "waiting" && user != 'notLoggedIn';
     }
+
 }
 
 window.customElements.define(UserLogin.is, UserLogin);
