@@ -12,25 +12,83 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-homepage">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        This is the homepage
-    </div>
-  </template>
+        <!-- API get subscribed videos call -->
+        <iron-ajax
+            auto
+            id="subscribedVideosAjax"
+            with-credentials="true"
+            url="[[subscribedVideosURL]]"
+            method="get"
+            handle-as="json"
+            on-response="handleSubscribedVideosResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
 
-  <script>
-    class MyHomepage extends Polymer.Element {
-      static get is() { return 'my-homepage'; }
-    }
+        <div class="card">
+            <h1>Spillelister du abonnerer på:</h1>
 
-    window.customElements.define(MyHomepage.is, MyHomepage);
-  </script>
+            <template is="dom-if" if="[[isLecturer]]">
+                <h1>Videoer du har lastet opp:</h1>
+                <h1>Spillelister du administrerer:</h1>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class MyHomepage extends Polymer.Element {
+            static get is() { return 'my-homepage'; }
+            static get properties() {
+                return {
+                    subscribedVideosURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/getSubscribed.php'
+                    },
+                    user: {
+                        type: Object,
+                        observer: "userChanged"
+                    },
+                    isLecturer: {
+                        type: Boolean,
+                        value: false
+                    },
+                    isAdmin: {
+                        type: Boolean,
+                        value: false
+                    },
+                    subscribedPlaylists: Array
+                }
+            }
+
+            /*
+             * Update privilege variables based on privilege level
+             */ 
+            userChanged() {
+                console.log("updating privilege in homepage") // DEBUG
+                this.isLecturer = (this.user.privilege_level >= 1);
+                this.isAdmin = (this.user.privilege_level >= 2);
+            }
+
+            /*
+             * Handle response from API request to get subscribed playlists
+             */
+            handleSubscribedVideosResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.subscribedPlaylists = res.detail.response.playlists;
+                }
+                console.log(this.subscribedPlaylists);
+            }
+        }
+
+window.customElements.define(MyHomepage.is, MyHomepage);
+    </script>
 </dom-module>
