@@ -30,7 +30,7 @@ class VideoManager {
      * 
      * @return array[] Returns an associative array with the fields 'status', 'vid' (video id) and 'errorMessage' (if error).
      */
-    public function upload($title, $description, $uid, $topic, $course_code, $videoRef, $thumbnailRef) {
+    public function upload($title, $description, $uid, $topic, $course_code, $videoRef, $thumbnail, $subtitlesRef = null) {
         $ret['status'] = 'fail';
         $ret['vid'] = null;
         $ret['errorMessage'] = null;
@@ -48,7 +48,6 @@ class VideoManager {
                 try {
                     $title = htmlspecialchars($title);
                     $description = htmlspecialchars($description);
-                    $thumbnail = getThumbnail($thumbnailRef);               // Muligens vi må endre til $_FILES på noen av de under, i tilfelle vil $videoRef bli helt fjernet.
                     $uid = htmlspecialchars($uid);
                     $topic = htmlspecialchars($topic);
                     $course_code = htmlspecialchars($course_code);
@@ -70,6 +69,7 @@ class VideoManager {
 
                     if ($sth->rowCount()==1) {
                         $id = $this->db->lastInsertId();
+                        // Upload video:
                         if (!file_exists(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/videos')) {      // The user have not uploaded anything before.
                             mkdir(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/videos', 0777, true);
                         }
@@ -79,7 +79,21 @@ class VideoManager {
                         } else {
                             $sql = "delete from videos where id=$id";
                             $this->db->execute($sql);
-                            $ret['errorMessage'] = "Klarte ikke å lagre filen.";
+                            $ret['errorMessage'] = "Klarte ikke å lagre videofilen.";
+                        }
+                        // Upload subtitles if exist:
+                        if ($subtitlesRef != null) {
+                            if (!file_exists(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles')) {      // The user have not uploaded any subtitles before.
+                                mkdir(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles', 0777, true);
+                            }
+                            if (move_uploaded_file($videoRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$id)) {
+                                $ret['status'] = 'ok';
+                                $ret['vid'] = $id;
+                            } else {
+                                $sql = "delete from videos where id=$id";
+                                $this->db->execute($sql);
+                                $ret['errorMessage'] = "Klarte ikke å lagre undertekstene.";
+                            }
                         }
                     } else {
                         $ret['errorMessage'] = "Klarte ikke å laste opp filen.";
