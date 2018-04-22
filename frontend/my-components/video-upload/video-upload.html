@@ -57,7 +57,8 @@
             description: String,
             topic: String,
             course_code: String,
-            thumbnail: String
+            thumbnail: String,
+            video_url: String               // URL to show video without uploading.
         };
       }
 
@@ -72,13 +73,10 @@
         console.log("File: " + uploadedVideo);
         this.$.setThumbnailDialog.open();
         var video =  this.$.player;
-        var obj_url = window.URL.createObjectURL(uploadedVideo);
-        console.log("File-url: " + obj_url);
-        video.src = obj_url;
-        video.play();
-        //window.URL.revokeObjectURL(obj_url);
-          //this.password = "";
-          //this.parentElement.active = false;           
+        this.video_url = window.URL.createObjectURL(uploadedVideo);    // Make a url to the video.
+        console.log("File-url: " + this.video_url);
+        video.src = this.video_url;
+        video.play();           
       }
 
       /*
@@ -107,16 +105,6 @@
         oReq.send(form);
       }
 
-      /*
-       * Create elements for getThumbnail()
-       */
-      createThumbnailElements() {
-        console.log("Message");
-    var btn = document.uploadForm.createElement("BUTTON");
-    var t = document.createTextNode("CLICK ME");
-    btn.appendChild(t);
-    document.body.appendChild(btn);
-      } 
 
       /**
        * Set a thumbnail
@@ -124,6 +112,7 @@
        * This code is based on: https://bitbucket.org/okolloen/imt2291-v2018/src/30012325241c1c3826a3d6e596a459937a3a12d1/javascript_lab1/video.html?at=master&fileviewer=file-view-default
        */
       setThumbnail() {
+        window.URL.revokeObjectURL(this.video_url);
         var cv = this.$.cv;
         const ctx = cv.getContext('2d');
         var player = this.$.player;
@@ -139,26 +128,26 @@
       }
 
       updateProgress (oEvent) {
-  if (oEvent.lengthComputable) {
-    var percentComplete = oEvent.loaded / oEvent.total * 100;
-    console.log("Percent complete: " + percentComplete);
-  } else {
-    // Unable to compute progress information since the total size is unknown
-    console.log("Could not calculate percent complete")
-  }
-}
+        if (oEvent.lengthComputable) {
+          var percentComplete = oEvent.loaded / oEvent.total * 100;
+          console.log("Percent complete: " + percentComplete);
+        } else {
+          // Unable to compute progress information since the total size is unknown
+          console.log("Could not calculate percent complete")
+        }
+      }
 
-transferComplete(evt) {
-  console.log("The transfer is complete.");
-}
+      transferComplete(evt) {
+        console.log("The transfer is complete.");
+      }
 
-transferFailed(evt) {
-  console.log("An error occurred while transferring the file.");
-}
+      transferFailed(evt) {
+        console.log("An error occurred while transferring the file.");
+      }
 
-transferCanceled(evt) {
-  console.log("The transfer has been canceled by the user.");
-}
+      transferCanceled(evt) {
+        console.log("The transfer has been canceled by the user.");
+      }
     }
 
     window.customElements.define(VideoUpload.is, VideoUpload);
