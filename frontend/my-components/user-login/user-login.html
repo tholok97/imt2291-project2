@@ -1,0 +1,165 @@
+<!--
+    Based on code by Øivind Kolloen
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
+<dom-module id="user-login">
+    <template>
+        <style>
+            :host {
+                display: block;
+                color: black;
+            }
+        </style>
+
+        <!-- TODO: iron-ajax call should be made here to check if user is 
+        logged in or not!!! (Send through property from parent?)-->
+
+        <!-- API login call -->
+        <iron-ajax
+            id="loginAjax"
+            with-credentials="true"
+            url="[[loginURL]]"
+            method="post"
+            body='{"username": "[[username]]", "password": "[[password]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleLoginResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+        <!-- API logout call -->
+        <iron-ajax
+            id="logoutAjax"
+            with-credentials="true"
+            url="[[logoutURL]]"
+            method="get"
+            handle-as="json"
+            on-response="handleLogoutResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+        <!-- shown while waiting to load -->
+        <template is="dom-if" if="[[isWaiting(user)]]">
+            <paper-spinner active></paper-spinner>
+        </template>
+
+        <template is="dom-if" if="[[!isWaiting(user)]]">
+
+            <!-- shown if user not logged in -->
+            <template is="dom-if" if="[[!isLoggedIn(user)]]">
+                <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
+                <paper-input id="password" label="Passord" value="{{password}}"></paper-input>
+                <paper-button raised on-click="login">Logg inn</paper-button>
+            </template>
+
+            <!-- shown if user logged in -->
+            <template is="dom-if" if="{{isLoggedIn(user)}}">
+                Du er logget inn som [[user.firstname]] [[user.lastname]]<br>
+                <br>
+                <paper-button raised on-click="logout">Logg ut</paper-button>
+            </template>
+        </template>
+    </template>
+
+    <script>
+        /**
+         * `user-login`
+         *
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+class UserLogin extends Polymer.Element {
+    static get is() { return 'user-login'; }
+    static get properties() {
+        return {
+            // where is the login API?
+            loginURL : {                                    
+                type: String,
+                value: window.Polymer.apiBaseURL+'user/login.php'
+            },
+            // where is the logout API?
+            logoutURL : {                                  
+                type: String,
+                value: window.Polymer.apiBaseURL+'user/logout.php'
+            },
+            // is logged in?
+            loggedIn: {                                   
+                type: Boolean,
+                value: false
+            },
+            username: String,                            
+            password: String,
+            user: {
+                type: Object,
+                value: "waiting",
+                notify: true
+            }
+        };
+    }
+
+    /*
+     * Login using iron-ajax element with entered credentials
+     */
+    login() {                                         
+        this.$.loginAjax.generateRequest();
+        this.password = "";
+        this.parentElement.active = false;           
+    }
+
+    /*
+     * Logout using iron-ajax element
+     */
+    logout() {                                      
+        this.$.logoutAjax.generateRequest();
+        this.parentElement.active = false;         
+    }
+
+    /*
+     * Handle response from login API call
+     */
+    handleLoginResponse(res) {
+        if (res.detail.response.status == 'ok') {
+            this.user = res.detail.response.user;
+        }
+        console.log(res.detail.response)  // DEBUG
+    }
+
+    /*
+     * Handle response from logout API call
+     */
+    handleLogoutResponse(res) {
+        if (res.detail.response.status == 'ok') {
+            this.user = 'notLoggedIn';
+        }
+        console.log(res.detail.response);   // DEBUG
+    }
+
+    /*
+     * is the given user logged in?
+     */
+    isLoggedIn(user) {
+        return user != "waiting" && user != 'notLoggedIn';
+    }
+
+    /*
+     * is the given user in waiting state? (waiting for answer from server)
+     */
+    isWaiting(user) {
+        return user == "waiting" && user != 'notLoggedIn';
+    }
+
+}
+
+window.customElements.define(UserLogin.is, UserLogin);
+    </script>
+</dom-module>

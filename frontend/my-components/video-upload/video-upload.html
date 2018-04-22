@@ -51,7 +51,7 @@
           // where is the upload API?
           uploadURL : {                                    
                 type: String,
-                value: "http://localhost/www-teknologi/prosjekt2/imt2291-project2/backend/api/video/upload.php"//window.Polymer.apiBaseURL+'video/upload.php'
+                value: window.Polymer.apiBaseURL+'video/upload.php'
             },
             title: String,
             description: String,
@@ -102,6 +102,7 @@
         oReq.addEventListener("abort", this.transferCanceled);
 
         oReq.open("POST", this.uploadURL);
+        oReq.withCredentials = true;
         oReq.send(form);
       }
 
