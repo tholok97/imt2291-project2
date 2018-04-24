@@ -16,30 +16,50 @@ session_start();
 setApiHeaders("POST");
 
 // Get json as string and convert it to a object:
-$json_str = file_get_contents('php://input');
-$json = json_decode($json_str);
+/*$json_str = file_get_contents('php://input');
+$json = json_decode($json_str);*/
 
 
 // Check if correct information is given:
-if (isset($json->title)                               // If correct variables is given.
-    && isset($json->description)
-    && isset($json->topic)
-    && isset($json->course_code)) {
+if (isset($_POST['title']) && $_POST['title'] != ""                               // If correct variables is given.
+    && isset($_POST['description']) && $_POST['description'] != "" 
+    && isset($_POST['topic']) && $_POST['topic'] != ""
+    && isset($_POST['course_code']) && $_POST['course_code'] != ""
+    && isset($_POST['thumbnail']) && $_POST['thumbnail'] != "") {
     
     // Check if video is given:
-    if (isset($_FILES['video']) && isset($_FILES['thumbnail'])) {
+    if (isset($_FILES['video'])) {
         if (isset($_SESSION['uid'])) {                                      // If logged in.
+            $userManager = new UserManager(DB::getDBConnection());        // Start a new videomanager-instance.
             $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));  //Get info about user.
-            if ($user['status'] == "ok" && $user['privilege_level'] >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
+            if ($user['status'] == "ok" && $user['user']->privilege_level >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
                 $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
-                $result = $videoManager->upload()  (                            // Update video info.
-                    htmlspecialchars($json->title),
-                    htmlspecialchars($json->description),
-                    htmlspecialchars($_SESSION['uid']),
-                    htmlspecialchars($json->topic),
-                    htmlspecialchars($json->course_code),
-                    htmlspecialchars($_FILES['video']),
-                    htmlspecialchars($_FILES['thumbnail']));    
+                    $result = null;                                                     //Just be sure to have it set here.
+                    if (isset($_FILES['subtitles'])) {                                  // Upload with subtitles.
+                        $result = $videoManager->upload(                            // Upload video and subtitles.
+                            htmlspecialchars($_POST['title']),
+                            htmlspecialchars($_POST['description']),
+                            htmlspecialchars($_SESSION['uid']),
+                            htmlspecialchars($_POST['topic']),
+                            htmlspecialchars($_POST['course_code']),
+                            $_FILES['video'],
+                            $_POST['thumbnail'],
+                            $_FILES['subtitles']
+                        );
+                    }
+                    else {                                                              // Not any subtitles given.
+                        $result = $videoManager->upload(                            // Upload video and subtitles.
+                            htmlspecialchars($_POST['title']),
+                            htmlspecialchars($_POST['description']),
+                            htmlspecialchars($_SESSION['uid']),
+                            htmlspecialchars($_POST['topic']),
+                            htmlspecialchars($_POST['course_code']),
+                            $_FILES['video'],
+                            $_POST['thumbnail'],
+                            null
+                        );
+                    }
+                        
                 
                 echo json_encode($result);                          // Return.
             }
