@@ -207,7 +207,13 @@ class VideoManager {
             while($row = $sth->fetch(PDO::FETCH_ASSOC))
             {
                 $ret['status'] = 'ok';
-                $ret['videos'][$i] = $this->get(htmlspecialchars($row['vid']), false);
+
+                // NOTE THAT THIS LINE **SHOULD** BE BROKEN INTO STEPS:
+                // - do get call and react to status
+                //  - if status fail -> fail
+                //  - if status ok -> fetch out video from get return
+                $ret['videos'][$i] = $this->get(htmlspecialchars($row['vid']), false)['video'];
+
                 $i++;
             }
         } catch (PDOException $ex) {
