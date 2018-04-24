@@ -16,7 +16,7 @@
       <paper-input id="topic" label="Tema" value="{{topic}}"></paper-input>
       <paper-input id="course_code" label="Emnekode" value="{{course_code}}"></paper-input>
       <label id="videoFile">Video som skal lastes opp:</label> <input type="file" name="video" id="videoFile" on-change="getThumbnail"><br />
-      <label id="subtitleFile">Undertekst-fil:</label> <input type="file" name="subtitles" id="subtitleFile"><br />
+      <label id="subtitleFile">Undertekst-fil (valgfri):</label> <input type="file" name="subtitles" id="subtitleFile"><br />
       
       <canvas id="cv" height="400" width="400"></canvas><br>
       <paper-button raised on-click="getThumbnail">Velg ny thumbnail</paper-button>
@@ -31,6 +31,13 @@
         <div class="buttons">
           <paper-button autofocus dialog-confirm on-click="setThumbnail">Sett som thumbnail</paper-button>
         </div>
+      </paper-dialog>
+      <paper-dialog id="resultDialog">
+          <h2>[[responseStatus]].</h2>
+          <p>[[responseMessage]]</p>
+          <div class="buttons">
+            <paper-button autofocus dialog-confirm>OK</paper-button>
+          </div>
       </paper-dialog>
     </div>
   </template>
@@ -58,7 +65,12 @@
             topic: String,
             course_code: String,
             thumbnail: String,
-            video_url: String               // URL to show video without uploading.
+            video_url: String,               // URL to show video without uploading.
+            responseStatus: String,          // This is if a response has been good or bad.
+            responseMessage: {
+              type: String,
+              value: ""
+            }
         };
       }
 
@@ -79,54 +91,82 @@
         video.play();           
       }
 
+
       /*
       * Uploading
       */
       upload() {                                      
-        console.log("Upload");
-        const form = new FormData();
-        form.append('title', this.title);
-        form.append('description', this.description);
-        form.append('topic', this.topic);
-        form.append('course_code', this.course_code);
-        form.append('thumbnail', this.thumbnail);
-        form.append('video', this.$.videoFile.files[0]);
-        form.append('subtitles', this.$.subtitleFile.files[0]);
-        var oReq = new XMLHttpRequest();
-        oReq.onload = function (res) {
-          console.log (res.target.responseText);
-        };
-        oReq.addEventListener("progress", this.updateProgress);
-        oReq.addEventListener("load", this.transferComplete);
-        oReq.addEventListener("error", this.transferFailed);
-        oReq.addEventListener("abort", this.transferCanceled);
+        if (this.title != "" && this.title != undefined        // If written something in all fields.
+          && this.description != "" && this.description != undefined
+          && this.topic != "" && this.topic != undefined
+          && this.course_code != "" && this.course_code != undefined) {
+            console.log("All needed fields filled in, uploading....");
+            const form = new FormData();
+            form.append('title', this.title);
+            form.append('description', this.description);
+            form.append('topic', this.topic);
+            form.append('course_code', this.course_code);
+            form.append('thumbnail', this.thumbnail);
+            form.append('video', this.$.videoFile.files[0]);
+            form.append('subtitles', this.$.subtitleFile.files[0]);
+            var oReq = new XMLHttpRequest();
+            const _this = this;
+            oReq.onload = function (res) {
+              console.log (res.target.responseText);
+              var result = JSON.parse(res.target.responseText);
+              if (result.status == "ok") {     // Everything ok.
+                _this.responseStatus = "Resultat OK";
+                _this.responseMessage = "Videoen er nå lastet opp";
+              }
+              else {                                           // Something went wrong
+                _this.responseStatus = "Resultat feilet";
+                _this.responseMessage = "Feilmelding: " + result.errorMessage;
+              }
+              _this.$.resultDialog.open();
+            }.bind(this);
+            oReq.addEventListener("progress", this.updateProgress);
+            oReq.addEventListener("load", this.transferComplete);
+            oReq.addEventListener("error", this.transferFailed);
+            oReq.addEventListener("abort", this.transferCanceled);
 
-        oReq.open("POST", this.uploadURL);
-        oReq.withCredentials = true;
-        oReq.send(form);
+            oReq.open("POST", this.uploadURL);
+            oReq.withCredentials = true;
+            oReq.send(form);
+        }
+        else {                      // If not written something in some fields, give error.
+          console.log("All needed fields are not filled, please fill..")
+          this.responseStatus = "Feilet"
+          this.responseMessage = "Du må fylle inn alle felt først."
+          this.$.resultDialog.open();
+        }
       }
 
 
       /**
-       * Set a thumbnail
+       * Set a thumbnail of the frame the player stands on.
        * 
        * This code is based on: https://bitbucket.org/okolloen/imt2291-v2018/src/30012325241c1c3826a3d6e596a459937a3a12d1/javascript_lab1/video.html?at=master&fileviewer=file-view-default
        */
       setThumbnail() {
+        console.log("Starting setThumbnail")
         window.URL.revokeObjectURL(this.video_url);
         var cv = this.$.cv;
         const ctx = cv.getContext('2d');
         var player = this.$.player;
-        cv.height = player.videoHeight;                  // Set height
-        cv.width = player.videoWidth;                    // and width of canvas to height and width of video
-        ctx.drawImage(player, 0, 0);                     // Draw the currently showing image from the video player on the canvas
-        this.thumbnail = cv.toDataURL();                  // Get contents of canvas as png image (default)
+        cv.height = player.videoHeight/2;                                       // Set height
+        cv.width = player.videoWidth/2;                                         // and width of canvas to height and width of video
+
+        ctx.drawImage(player, 0, 0, player.videoWidth/2, player.videoHeight/2);                                          // Draw the currently showing image from the video player on the canvas
+        this.thumbnail = cv.toDataURL();                                      // Get contents of canvas as png image (default)
         //const form = new FormData();
         console.log("PNG: " + this.thumbnail);
         // Can use XMLHttpRequest to send this data to the server
         // Base64 decode everything after first ","
-
       }
+
+
+      
+      
 
       updateProgress (oEvent) {
         if (oEvent.lengthComputable) {
