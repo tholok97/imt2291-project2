@@ -1,33 +1,63 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <dom-module id="video-list">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2>Hello [[vids]]!</h2>
-  </template>
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            paper-card {
+                margin: 20px;
+            }
+        </style>
 
-  <script>
-    /**
-     * `video-list`
-     * 
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
-    class VideoList extends Polymer.Element {
-      static get is() { return 'video-list'; }
-      static get properties() {
+        <template is="dom-repeat" items="[[videos]]" as="video">
+
+            <paper-card image="[[videoThumbnailURL]]?vid=[[video.vid]]">
+
+                <div class="card-content">
+                    <h3>Tittel: [[video.title]]</h3>
+                    <p><b>Emnekode:</b> [[video.course_code]]</p>
+                    <p><b>Emne:</b> [[video.topic]]</p>
+                    <p>Beskrivelse: [[video.description]]</p>
+                </div>
+
+                <div class="card-actions">
+                    <div class="horizontal justified">
+                        <paper-button>Se video</paper-button>
+                    </div>
+                </div>
+
+            </paper-card>
+
+        </template>
+
+    </template>
+
+
+    <script>
+        /**
+         * `video-list`
+         * 
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+class VideoList extends Polymer.Element {
+    static get is() { return 'video-list'; }
+    static get properties() {
         return {
-            vids: Array
+            videos: Array,
+            videoThumbnailURL: {                                  
+                type: String,
+                value: window.Polymer.apiBaseURL+'video/getThumbnail.php'
+            },
         };
-      }
     }
+}
 
-    window.customElements.define(VideoList.is, VideoList);
-  </script>
+window.customElements.define(VideoList.is, VideoList);
+    </script>
 </dom-module>

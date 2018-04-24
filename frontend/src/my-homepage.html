@@ -24,6 +24,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
 
+        <!-- API get owned videos -->
+        <iron-ajax
+            auto
+            id="ownedVideos"
+            with-credentials="true"
+            url="[[ownedVideosURL]]"
+            method="get"
+            handle-as="json"
+            on-response="handleOwnedVideosResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
         <!-- API get subscribed playlists call -->
         <iron-ajax
             auto
@@ -44,7 +56,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             url="[[subscribedPlaylistsURL]]"
             method="get"
             handle-as="json"
-            on-response="handleMaintainsPlaylistURL"
+            on-response="handleMaintainsPlaylistResponse"
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
@@ -56,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template is="dom-if" if="[[isLecturer]]">
 
                 <h1>Videoer du har lastet opp:</h1>
-                <video-list vids="[[ownedVideos]]"></video-list>
+                <video-list videos="[[ownedVideos]]"></video-list>
 
                 <h1>Spillelister du administrerer:</h1>
                 <playlist-list playlists="[[maintainsPlaylists]]"></playlist-list>
@@ -78,6 +90,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/getUserMaintains.php'
                     },
+                    ownedVideosURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'video/getAllUserVideos.php'
+                    },
                     user: {
                         type: Object,
                         observer: "userChanged"
@@ -92,10 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     subscribedPlaylists: Array,
                     maintainsPlaylists: Array,
-                    ownedVideos: {
-                        type: Array,
-                        value: [7,8,9]
-                    }
+                    ownedVideos: Array
                 }
             }
 
@@ -122,12 +135,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             /*
              * Handle response from API request to get maintained playlists
              */
-            handleMaintainsPlaylistURL(res) {
+            handleMaintainsPlaylistResponse(res) {
                 console.log(res.detail.response);
                 if (res.detail.response.status == 'ok') {
                     this.maintainsPlaylists = res.detail.response.playlists;
                 }
                 console.log(this.subscribedPlaylists);
+            }
+
+            /*
+             * Handle response from API request to get owned videos
+             */
+            handleOwnedVideosResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.ownedVideos = res.detail.response.videos;
+                }
+                console.log(this.ownedVideos);
             }
         }
 
