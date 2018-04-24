@@ -11,6 +11,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
 
+<link rel="import" href="../my-components/video-list/video-list.html">
+<link rel="import" href="../my-components/playlist-list/playlist-list.html">
+
 <dom-module id="my-homepage">
     <template>
         <style include="shared-styles">
@@ -21,24 +24,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
 
-        <!-- API get subscribed videos call -->
+        <!-- API get subscribed playlists call -->
         <iron-ajax
             auto
             id="subscribedVideosAjax"
             with-credentials="true"
-            url="[[subscribedVideosURL]]"
+            url="[[subscribedPlaylistsURL]]"
             method="get"
             handle-as="json"
-            on-response="handleSubscribedVideosResponse"
+            on-response="handleSubscribedPlaylistsResponse"
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
         <div class="card">
             <h1>Spillelister du abonnerer på:</h1>
+            <playlist-list playlists="[[subscribedPlaylists]]"></playlist-list>
 
             <template is="dom-if" if="[[isLecturer]]">
+
                 <h1>Videoer du har lastet opp:</h1>
+                <video-list vids="[[ownedVideos]]"></video-list>
+
                 <h1>Spillelister du administrerer:</h1>
+                <playlist-list pids="[[ownedPlaylists]]"></playlist-list>
+
             </template>
         </div>
     </template>
@@ -48,7 +57,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             static get is() { return 'my-homepage'; }
             static get properties() {
                 return {
-                    subscribedVideosURL : {                                    
+                    subscribedPlaylistsURL : {                                    
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/getSubscribed.php'
                     },
@@ -64,7 +73,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: Boolean,
                         value: false
                     },
-                    subscribedPlaylists: Array
+                    subscribedPlaylists: Array,
+                    ownedPlaylists: {
+                        type: Array,
+                        value: [4,5,6]
+                    },
+                    ownedVideos: {
+                        type: Array,
+                        value: [7,8,9]
+                    }
                 }
             }
 
@@ -80,7 +97,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             /*
              * Handle response from API request to get subscribed playlists
              */
-            handleSubscribedVideosResponse(res) {
+            handleSubscribedPlaylistsResponse(res) {
                 console.log(res.detail.response);
                 if (res.detail.response.status == 'ok') {
                     this.subscribedPlaylists = res.detail.response.playlists;

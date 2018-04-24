@@ -1,0 +1,60 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<dom-module id="playlist-list">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            paper-card {
+                margin: 20px;
+            }
+        </style>
+
+        <template is="dom-repeat" items="[[playlists]]" as="playlist">
+
+            <paper-card image="[[playlistThumbnailURL]]?pid=[[playlist.pid]]">
+
+                <div class="card-content">
+                    <h3>Tittel: [[playlist.title]]</h3>
+                    <p>Beskrivelse: [[playlist.description]]</p>
+                </div>
+
+                <div class="card-actions">
+                    <div class="horizontal justified">
+                        <paper-button>Se spilleliste</paper-button>
+                    </div>
+                </div>
+
+            </paper-card>
+
+        </template>
+
+    </template>
+
+    <script>
+        /**
+         * `playlist-list`
+         * 
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+class PlaylistList extends Polymer.Element {
+    static get is() { return 'playlist-list'; }
+    static get properties() {
+        return {
+            playlists: Array,
+            playlistThumbnailURL : {                                  
+                type: String,
+                value: window.Polymer.apiBaseURL+'playlist/getThumbnail.php'
+            },
+        };
+    }
+}
+
+window.customElements.define(PlaylistList.is, PlaylistList);
+    </script>
+</dom-module>

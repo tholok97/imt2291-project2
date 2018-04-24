@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="video-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[vids]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `video-list`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class VideoList extends Polymer.Element {
+      static get is() { return 'video-list'; }
+      static get properties() {
+        return {
+            vids: Array
+        };
+      }
+    }
+
+    window.customElements.define(VideoList.is, VideoList);
+  </script>
+</dom-module>
