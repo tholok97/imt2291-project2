@@ -29,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             auto
             id="ownedVideos"
             with-credentials="true"
-            url="[[ownedVideosURL]]"
+            url="[[ownedVideosURL]]?uid=[[user.uid]]"
             method="get"
             handle-as="json"
             on-response="handleOwnedVideosResponse"
