@@ -42,12 +42,13 @@ class VideoManager {
         }
 
         // If not someone who is trying to hack us.
-        if (is_uploaded_file($videoRef['tmp_name']) && is_uploaded_file($thumbnailRef['tmp_name'])) {
+        if (is_uploaded_file($videoRef['tmp_name'])) {
             // If file size not too big.
-            if($videoRef['size'] <= Constants::MAX_FILESIZE_VIDEO && $thumbnailRef['size'] <= Constants::MAX_FILESIZE_THUMBNAIL) {
+            if($videoRef['size'] <= Constants::MAX_FILESIZE_VIDEO && sizeof($thumbnail) <= Constants::MAX_FILESIZE_THUMBNAIL) {
                 try {
                     $title = htmlspecialchars($title);
                     $description = htmlspecialchars($description);
+                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));
                     $uid = htmlspecialchars($uid);
                     $topic = htmlspecialchars($topic);
                     $course_code = htmlspecialchars($course_code);
@@ -81,12 +82,13 @@ class VideoManager {
                             $this->db->execute($sql);
                             $ret['errorMessage'] = "Klarte ikke å lagre videofilen.";
                         }
+                
                         // Upload subtitles if exist:
                         if ($subtitlesRef != null) {
                             if (!file_exists(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles')) {      // The user have not uploaded any subtitles before.
                                 mkdir(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles', 0777, true);
                             }
-                            if (move_uploaded_file($videoRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$id)) {
+                            if (move_uploaded_file($subtitlesRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$id)) {
                                 $ret['status'] = 'ok';
                                 $ret['vid'] = $id;
                             } else {
