@@ -36,6 +36,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
+        <!-- API get playlists user maintains -->
+        <iron-ajax
+            auto
+            id="maintainsPlaylistsURL"
+            with-credentials="true"
+            url="[[subscribedPlaylistsURL]]"
+            method="get"
+            handle-as="json"
+            on-response="handleMaintainsPlaylistURL"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+
         <div class="card">
             <h1>Spillelister du abonnerer på:</h1>
             <playlist-list playlists="[[subscribedPlaylists]]"></playlist-list>
@@ -46,7 +59,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <video-list vids="[[ownedVideos]]"></video-list>
 
                 <h1>Spillelister du administrerer:</h1>
-                <playlist-list pids="[[ownedPlaylists]]"></playlist-list>
+                <playlist-list playlists="[[maintainsPlaylists]]"></playlist-list>
 
             </template>
         </div>
@@ -61,6 +74,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/getSubscribed.php'
                     },
+                    maintainsPlaylistsURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/getUserMaintains.php'
+                    },
                     user: {
                         type: Object,
                         observer: "userChanged"
@@ -74,10 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         value: false
                     },
                     subscribedPlaylists: Array,
-                    ownedPlaylists: {
-                        type: Array,
-                        value: [4,5,6]
-                    },
+                    maintainsPlaylists: Array,
                     ownedVideos: {
                         type: Array,
                         value: [7,8,9]
@@ -101,6 +115,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(res.detail.response);
                 if (res.detail.response.status == 'ok') {
                     this.subscribedPlaylists = res.detail.response.playlists;
+                }
+                console.log(this.subscribedPlaylists);
+            }
+
+            /*
+             * Handle response from API request to get maintained playlists
+             */
+            handleMaintainsPlaylistURL(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.maintainsPlaylists = res.detail.response.playlists;
                 }
                 console.log(this.subscribedPlaylists);
             }
