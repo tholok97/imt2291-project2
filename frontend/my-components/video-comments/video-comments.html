@@ -1,0 +1,54 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="video-comments">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <dom-repeat items="{{comments}}">
+      <template>
+        <paper-card>
+          <div class="card-content">
+            <div class="cafe-header">[[item.user.firstname]] [[item.user.lastname]]</div>
+            <p class="cafe-light">[[item.comment]]</p>
+          </div>
+        </paper-card>
+      </template>
+    </dom-repeat>
+  </template>
+
+  <script>
+    /**
+     * `video-comments`
+     * Show a videos comments.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class VideoComments extends Polymer.Element {
+      static get is() { return 'video-comments'; }
+      static get properties() {
+        return {
+          vid: {
+            type: Number,
+            value: -1,
+            observer: 'vidChanged'
+          },
+          comments: Array
+        };
+      }
+
+      /*
+      * Called when vid changes.
+      */
+      vidChanged() {
+        
+      }
+    }
+
+    window.customElements.define(VideoComments.is, VideoComments);
+  </script>
+</dom-module>
