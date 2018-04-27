@@ -1,0 +1,273 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="video-update">
+  <template>
+    <!-- API get-video call -->
+    <iron-ajax
+    auto
+    id="getVideoAjax"
+    with-credentials="true"
+    url="[[getVideoURL]]"
+    method="GET"
+    content-type="application/json"
+    handle-as="json"
+    on-response="handleGetVideoResponse"
+    last-response="{{response}}"
+    debounce-duration="300"></iron-ajax>
+
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <!--If gotten all info needed to show things-->
+      <template is="dom-if" if="{{isReady}}"></template>
+        <h2>Hallo</h2>
+        <div id="uploadForm">
+            <paper-input id="title" label="Tittel" value="{{video.title}}"></paper-input>
+            <paper-input id="description" label="Beskrivelse" value="{{video.description}}"></paper-input>
+            <paper-input id="topic" label="Tema" value="{{video.topic}}"></paper-input>
+            <paper-input id="course_code" label="Emnekode" value="{{video.course_code}}"></paper-input>
+            <label id="subtitleFile">Undertekst-fil (valgfri):</label> <input type="file" name="subtitles" id="subtitleFile"><br />
+            
+            <canvas id="cv" height="400" width="400"></canvas><br>
+            <paper-button raised on-click="getThumbnail">Velg ny thumbnail</paper-button>
+            <paper-button raised on-click="upload">Last opp</paper-button>
+          <paper-dialog id="setThumbnailDialog">
+              <h2>Sett et bilde som thumbnail</h2>
+              <p>Velg et bilde fra videoen som thumbnail.<br /><br />
+                Spill/Spol igjennom videoen til du er der du vil ha thumbnail, og klikk på knappen "Sett som thumbnail".
+              </p>
+              <video id="player" controls type="{{video.mime}}"></video>
+              <div class="buttons">
+                <paper-button autofocus dialog-confirm on-click="setThumbnail">Sett som thumbnail</paper-button>
+              </div>
+            </paper-dialog>
+            <paper-dialog id="resultDialog">
+                <h2>[[responseStatus]].</h2>
+                <p>[[responseMessage]]</p>
+                <div class="buttons">
+                  <paper-button autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+        </div>
+    </template>
+  </template>
+
+  <script>
+    /**
+     * `video-update`
+     * Update a video
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class VideoUpdate extends Polymer.Element {
+      static get is() { return 'video-update'; }
+      static get properties() {
+        return {
+          vid: {
+            type: Number,
+            value: -1
+          },
+          // where is the upload API?
+          updateURL : {                                    
+                type: String,
+                value: window.Polymer.apiBaseURL+'video/update.php'
+            },
+            getVideoURL : {                                    
+                type: String,
+                value: "http://localhost/www-teknologi/prosjekt2/imt2291-project2/backend/api/video/get.php?vid=59&increase=false" //+ this.vid //window.Polymer.apiBaseURL+'video/get.php?vid=' + this.vid
+            },
+          responseStatus: String,          // This is if a response has been good or bad.
+          responseMessage: {
+            type: String,
+            value: ""
+          },
+          isReady: {                      // Be sure we have gotten ajax-request back.
+            type: Boolean,
+            value: false
+          },
+          video: {
+            type: Object,
+            value: "",
+            notify: true
+          },
+          thumbnail: String,
+          isParamsReady: {                // Be sure we have parameters ready (vid for example), before doing ajax.
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      /**
+      *
+      *Run when ready (ready() crashes the element).
+      */
+      /*ready() {
+        console.log("Video id: " + this.vid);
+        if (this.vid == -1) {                   // If vid is not sent through, give error
+          this.responseStatus = "Feilet";
+          this.responseMessage = "Fikk ikke inn en gyldig video-id, vennligst gå tilbake."
+          this.$.resultDialog.open();
+        }
+        else {
+          this.isParamsReady = true;                  // Params is set, set as true.
+          this.$.getVideoAjax.generateRequest();
+          console.log("isParamsReady is now " + this.isParamsReady);
+        }
+      }*/
+
+
+      /*
+      * Set up thumbnail-getter by using the video set to upload
+      * 
+      * This code is based on: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
+      */
+      getThumbnail() { 
+        console.log("Starting getThumbnail(..)");
+        //var uploadedVideo = this.$.videoFile.files[0];  //(this.root).querySelector("#videoFile");
+        //console.log("File: " + uploadedVideo);
+        var url = window.Polymer.backendBaseURL + this.video.url
+        this.$.setThumbnailDialog.open();
+        var video =  this.$.player;
+        console.log("Video-url: " + url);
+        video.src = url;
+        video.play();           
+      }
+
+
+      /*
+      * Upload updated info.
+      */
+      upload() {                                      
+        if (this.video.title != "" && this.video.title != undefined        // If written something in all fields.
+          && this.video.description != "" && this.video.description != undefined
+          && this.video.topic != "" && this.video.topic != undefined
+          && this.video.course_code != "" && this.video.course_code != undefined) {
+            console.log("All needed fields filled in, uploading....");
+            console.log("Tumbnail: " + this.thumbnail);
+            const form = new FormData();                                //Update info...
+            form.append('vid', this.vid);                               // Send through video-id.
+            form.append('title', this.video.title);
+            form.append('description', this.video.description);
+            form.append('topic', this.video.topic);
+            form.append('course_code', this.video.course_code);
+            form.append('thumbnail', this.thumbnail);
+            if (this.$.subtitleFile.files.length == 1) {                      //If new subtitles-file added, add it.
+              form.append('subtitles', this.$.subtitleFile.files[0]);
+            }
+            var oReq = new XMLHttpRequest();
+            const _this = this;
+            oReq.onload = function (res) {
+              console.log (res.target.responseText);
+              var result = JSON.parse(res.target.responseText);
+              if (result.status == "ok") {     // Everything ok.
+                _this.responseStatus = "Resultat OK";
+                _this.responseMessage = "Videoen er nå lastet opp";
+              }
+              else {                                           // Something went wrong
+                _this.responseStatus = "Resultat feilet";
+                _this.responseMessage = "Feilmelding: " + result.errorMessage;
+              }
+              _this.$.resultDialog.open();
+            }.bind(this);
+            oReq.addEventListener("progress", this.updateProgress);
+            oReq.addEventListener("load", this.transferComplete);
+            oReq.addEventListener("error", this.transferFailed);
+            oReq.addEventListener("abort", this.transferCanceled);
+
+            oReq.open("POST", this.updateURL);
+            oReq.withCredentials = true;
+            oReq.send(form);
+        }
+        else {                      // If not written something in some fields, give error.
+          console.log("All needed fields are not filled, please fill..")
+          this.responseStatus = "Feilet"
+          this.responseMessage = "Du må fylle inn alle felt først."
+          this.$.resultDialog.open();
+        }
+      }
+
+
+      /**
+       * Set a new thumbnail of the frame the player stands on.
+       * 
+       * This code is based on: https://bitbucket.org/okolloen/imt2291-v2018/src/30012325241c1c3826a3d6e596a459937a3a12d1/javascript_lab1/video.html?at=master&fileviewer=file-view-default
+       */
+      setThumbnail() {
+        console.log("Starting setThumbnail")
+        var cv = this.$.cv;
+        const ctx = cv.getContext('2d');
+        var player = this.$.player;
+        player.pause();
+        cv.height = player.videoHeight/2;                                       // Set height
+        cv.width = player.videoWidth/2;                                         // and width of canvas to height and width of video
+
+        ctx.drawImage(player, 0, 0, player.videoWidth/2, player.videoHeight/2);                                          // Draw the currently showing image from the video player on the canvas
+        this.thumbnail = cv.toDataURL();                                      // Get contents of canvas as png image (default)
+        //const form = new FormData();
+        console.log("PNG: " + this.thumbnail);
+        // Can use XMLHttpRequest to send this data to the server
+        // Base64 decode everything after first ","
+      }
+
+      /*
+      * Handle response from getVideo-api.
+      */
+      handleGetVideoResponse(res) {
+        console.log("We have now gotten response from api.")
+        if (res.detail.response.status == 'ok') {
+            this.video = res.detail.response.video;
+            this.isReady = true;                          // Start template.
+            console.log("Is ready to start template");
+            
+            // Show current thumbnail:
+            var cv = this.$.cv;
+            var ctx = cv.getContext("2d");
+            var img = new Image();
+            img.onload = function() {
+              ctx.drawImage(img, 0, 0);
+            };
+            img.src = window.Polymer.apiBaseURL + "video/getThumbnail.php?vid=" + this.vid;
+        }
+        console.log(res.detail.response);  //
+        console.log("Video-object:" + this.video);
+      }
+      
+
+      updateProgress (oEvent) {
+        if (oEvent.lengthComputable) {
+          var percentComplete = oEvent.loaded / oEvent.total * 100;
+          console.log("Percent complete: " + percentComplete);
+        } else {
+          // Unable to compute progress information since the total size is unknown
+          console.log("Could not calculate percent complete")
+        }
+      }
+
+      transferComplete(evt) {
+        console.log("The transfer is complete.");
+      }
+
+      transferFailed(evt) {
+        console.log("An error occurred while transferring the file.");
+      }
+
+      transferCanceled(evt) {
+        console.log("The transfer has been canceled by the user.");
+      }
+
+
+    }
+
+
+    window.customElements.define(VideoUpdate.is, VideoUpdate);
+  </script>
+</dom-module>

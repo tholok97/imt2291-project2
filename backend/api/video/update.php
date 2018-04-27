@@ -16,30 +16,46 @@ session_start();
 
 setApiHeaders("POST");
 
-// Get json as string and convert it to a object:
-$json_str = file_get_contents('php://input');
-$json = json_decode($json_str);
-
+print_r($_POST);
 
 // Check if correct information is given:
-if (isset($json->vid)
-    && isset($json->title)
-    && isset($json->description)
-    && isset($json->topic)
-    && isset($json->course_code)) {
+if (isset($_POST['vid'])
+    && isset($_POST['title'])
+    && isset($_POST['description'])
+    && isset($_POST['topic'])
+    && isset($_POST['course_code'])
+    && isset($_POST['thumbnail'])) {
     
     if (isset($_SESSION['uid'])) {                                    // If logged in.
         $userManager = new UserManager(DB::getDBConnection());        // Start a new videomanager-instance.
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));  //Get info about user.
         if ($user['status'] == "ok" && $user['privilege_level'] >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
             $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
-            $result = $videoManager->update(                            // Update video info.
-                htmlspecialchars($json->vid),
-                htmlspecialchars($_SESSION['uid']),
-                htmlspecialchars($json->title),
-                htmlspecialchars($json->description),
-                htmlspecialchars($json->topic),
-                htmlspecialchars($json->course_code));    
+            if (isset($_FILES['subtitles'])) {                              // If subtitles is set.
+                $result = $videoManager->update(                            // Update video info.
+                    htmlspecialchars($_POST['vid']),
+                    htmlspecialchars($_SESSION['uid']),
+                    htmlspecialchars($_POST['title']),
+                    htmlspecialchars($_POST['description']),
+                    htmlspecialchars($_POST['topic']),
+                    htmlspecialchars($_POST['course_code']),
+                    $_POST['thumbnail'],
+                    $_FILES['subtitles']
+                );
+            }
+            else {
+                $result = $videoManager->update(                            // Update video info.
+                    htmlspecialchars($_POST['vid']),
+                    htmlspecialchars($_SESSION['uid']),
+                    htmlspecialchars($_POST['title']),
+                    htmlspecialchars($_POST['description']),
+                    htmlspecialchars($_POST['topic']),
+                    htmlspecialchars($_POST['course_code']),
+                    $_POST['thumbnail'],
+                    null
+                );
+            }
+                
         
             echo json_encode($result);                          // Return.
         }
