@@ -8,10 +8,9 @@
   <template>
     <!-- API get-video call -->
     <iron-ajax
-    auto
     id="getVideoAjax"
     with-credentials="true"
-    url="[[getVideoURL]]"
+    url="[[getVideoURL]]?vid=[[vid]]&increase=false"
     method="GET"
     content-type="application/json"
     handle-as="json"
@@ -73,7 +72,8 @@
         return {
           vid: {
             type: Number,
-            value: -1
+            value: -1,
+            observer: 'vidChanged'
           },
           // where is the upload API?
           updateURL : {                                    
@@ -82,7 +82,7 @@
             },
             getVideoURL : {                                    
                 type: String,
-                value: "http://localhost/www-teknologi/prosjekt2/imt2291-project2/backend/api/video/get.php?vid=59&increase=false" //+ this.vid //window.Polymer.apiBaseURL+'video/get.php?vid=' + this.vid
+                value: window.Polymer.apiBaseURL+'video/get.php'
             },
           responseStatus: String,          // This is if a response has been good or bad.
           responseMessage: {
@@ -108,9 +108,9 @@
 
       /**
       *
-      *Run when ready (ready() crashes the element).
+      *Run when vid-variable is updated/changed (ready() crashes the element).
       */
-      /*ready() {
+      vidChanged() {
         console.log("Video id: " + this.vid);
         if (this.vid == -1) {                   // If vid is not sent through, give error
           this.responseStatus = "Feilet";
@@ -122,7 +122,7 @@
           this.$.getVideoAjax.generateRequest();
           console.log("isParamsReady is now " + this.isParamsReady);
         }
-      }*/
+      }
 
 
       /*
