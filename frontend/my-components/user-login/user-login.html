@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-password-input/paper-password-input.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -56,7 +57,7 @@
             <!-- shown if user not logged in -->
             <template is="dom-if" if="[[!isLoggedIn(user)]]">
                 <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
-                <paper-input type="password" id="password" label="Passord" value="{{password}}"></paper-input>
+                <paper-password-input id="password" label="Passord" value="{{password}}"></paper-password-input>>
                 <paper-button raised on-click="login">Logg inn</paper-button>
             </template>
 
