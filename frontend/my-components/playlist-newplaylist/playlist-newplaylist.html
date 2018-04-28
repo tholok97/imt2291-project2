@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="playlist-newplaylist">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `playlist-newplaylist`
+     * Element to make a new playlist
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PlaylistNewplaylist extends Polymer.Element {
+      static get is() { return 'playlist-newplaylist'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'playlist-newplaylist'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PlaylistNewplaylist.is, PlaylistNewplaylist);
+  </script>
+</dom-module>
