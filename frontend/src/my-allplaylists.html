@@ -9,28 +9,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../my-components/playlist-list/playlist-list.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-allplaylists">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        This is the all playlists page
-    </div>
-  </template>
+        <!-- API get all playlists -->
+        <!-- USES SEARCH WITH EMPTY SEARCH STRING -->
+        <iron-ajax
+            auto
+            id="getAllPlaylistsAjax"
+            with-credentials="true"
+            url="[[getAllPlaylistsURL]]?search="
+            method="get"
+            handle-as="json"
+            on-response="handleGetAllPlaylistsResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
 
-  <script>
-    class MyAllPlaylists extends Polymer.Element {
-      static get is() { return 'my-allplaylists'; }
-    }
+        <div class="card">
+            <playlist-list playlists="[[playlists]]"></playlist-list>
+        </div>
+    </template>
 
-    window.customElements.define(MyAllPlaylists.is, MyAllPlaylists);
-  </script>
+    <script>
+        class MyAllPlaylists extends Polymer.Element {
+            static get is() { return 'my-allplaylists'; }
+            static get properties() {
+                return {
+                    playlists: Array,
+                    getAllPlaylistsURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/search.php'
+                    },
+                };
+            }
+
+            handleGetAllPlaylistsResponse(res) {
+
+                console.log(res.detail.response);
+
+                if (res.detail.response.status == 'ok') {
+                    this.playlists = res.detail.response.playlists; 
+                }
+            }
+        }
+
+window.customElements.define(MyAllPlaylists.is, MyAllPlaylists);
+    </script>
 </dom-module>

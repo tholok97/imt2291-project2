@@ -9,28 +9,72 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../my-components/video-list/video-list.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-allvideos">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        This is the all videos page
-    </div>
-  </template>
+        <!-- API get all videos -->
+        <!-- USES SEARCH WITH EMPTY SEARCH STRING -->
+        <iron-ajax
+            auto
+            id="getAllVideosURL"
+            with-credentials="true"
+            url="[[getAllVideosURL]]?search="
+            method="get"
+            handle-as="json"
+            on-response="handleGetAllVideosResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
 
-  <script>
-    class MyAllVideos extends Polymer.Element {
-      static get is() { return 'my-allvideos'; }
-    }
+        <div class="card">
 
-    window.customElements.define(MyAllVideos.is, MyAllVideos);
-  </script>
+            <video-list videos="[[videos]]"></video-list>
+
+        </div>
+    </template>
+
+    <script>
+        class MyAllVideos extends Polymer.Element {
+            static get is() { return 'my-allvideos'; }
+            static get properties() {
+                return {
+                    videos: Array,
+                    getAllVideosURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'video/search.php'
+                    },
+                }
+            }
+
+            handleGetAllVideosResponse(res) {
+
+                this.videos = Array();
+
+                console.log(res.detail.response);
+
+                if (res.detail.response.status == 'ok') {
+
+                    let result = res.detail.response.result;
+
+                    for (let i = 0; i < result.length; ++i) {
+
+                        if (result[i].status == 'ok') {
+                            this.videos.push(result[i].video);
+                        }
+                    }
+                }
+            }
+        }
+
+window.customElements.define(MyAllVideos.is, MyAllVideos);
+    </script>
 </dom-module>
