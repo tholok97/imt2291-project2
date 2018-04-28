@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../my-components/video-list/video-list.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-showplaylist">
@@ -21,8 +22,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
 
+
+        <!-- API get playlist -->
+        <iron-ajax
+            auto
+            id="getPlaylistAjax"
+            with-credentials="true"
+            url="[[getPlaylistURL]]?pid=[[pid]]"
+            method="get"
+            handle-as="json"
+            on-response="handleGetPlaylistResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+
+
         <div class="card">
-            This is the show playlist page for [[pid]]
+
+            <!-- title -->
+            <h1>[[playlist.title]]</h1>
+
+
+            <!-- placeholders -->
+            <h4>(Abonnoment knapp vil komme her)</h4>
+            <h4>(Admin knapp vil komme her)</h4>
+
+
+            <!-- list of maintainers -->
+            <h2>Administratorer:</h2>
+            <ul>
+                <template is="dom-repeat" items="[[playlist.maintainers]]" as="maintainer">
+                    <li>[[maintainer.firstname]] [[maintainer.lastname]]</li>
+                </template>
+            </ul>
+
+            <!-- description -->
+            <h2>Beskrivelse:</h2>
+            <p>[[playlist.description]]</p>
+
+            <!-- list of videos -->
+            <h2>Videoer:</h2>
+            <video-list videos="[[playlist.videos]]"></video-list>
+
+
         </div>
     </template>
 
@@ -31,20 +73,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             static get is() { return 'my-showplaylist'; }
             static get properties() {
                 return {
-                    subroute: Object,
-                    pid: Number
+                    subroute: {
+                        type: Object,
+                        observer: '_subrouteChanged'
+                    },
+                    pid: Number,
+                    getPlaylistURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/get.php'
+                    },
+                    playlist: Object
                 }
             }
 
             /**
-             * On ready -> prepare pid
-             */ 
-            ready() {
-                super.ready();
-
+             *  Prepare pid on subroute changed
+             */
+            _subrouteChanged() {
                 // path contains a leading /. Remove it and convert to number for pid
                 this.pid = Number(this.subroute.path.substr(1, this.subroute.path.length));
             }
+
+            handleGetPlaylistResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.playlist = res.detail.response.playlist;
+                }
+            }
+
 
         }
 
