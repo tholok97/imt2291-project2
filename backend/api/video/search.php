@@ -26,7 +26,7 @@ if (isset($_GET['search'])) {                // If correct variables is given.
     $options['title'] = true;
     $options['description'] = true;
         
-    $video = $videoManager->search(htmlspecialchars($_GET['search']));  // Get videos that matches the search-string.
+    $video = $videoManager->search(htmlspecialchars($_GET['search']), $options);  // Get videos that matches the search-string.
     echo json_encode($video);                                                       // Return.
 }
 else if(isset($json->search)) {

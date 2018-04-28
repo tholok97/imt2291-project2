@@ -34,7 +34,7 @@
 
                 <div class="card-actions">
                     <div class="horizontal justified">
-                        <paper-button>Se video</paper-button>
+                        <paper-button data-vid$="[[video.vid]]" on-click="gotoVideo">Se video</paper-button>
                     </div>
                 </div>
 
@@ -63,8 +63,22 @@ class VideoList extends Polymer.Element {
                 type: String,
                 value: window.Polymer.apiBaseURL+'video/getThumbnail.php'
             },
+            showVideoPath: {
+                type: String,
+                value: "video/"
+            }
         };
     }
+
+    gotoVideo(e) {
+
+        // fetch vid to goto
+        let vidToGoto = e.target.dataset.vid;
+
+        // goto the video
+        window.location = this.showVideoPath + vidToGoto;
+    }
+
 }
 
 window.customElements.define(VideoList.is, VideoList);
