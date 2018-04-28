@@ -32,7 +32,7 @@
 
                 <div class="card-actions">
                     <div class="horizontal justified">
-                        <paper-button>Se spilleliste</paper-button>
+                        <paper-button data-pid$="[[playlist.pid]]" on-click="gotoPlaylist">Se spilleliste</paper-button>
                     </div>
                 </div>
 
@@ -60,7 +60,20 @@ class PlaylistList extends Polymer.Element {
                 type: String,
                 value: window.Polymer.apiBaseURL+'playlist/getThumbnail.php'
             },
+            showPlaylistPath: {
+                type: String,
+                value: "showplaylist/"
+            }
         };
+    }
+
+    gotoPlaylist(e) {
+
+        // fetch pid to goto
+        let pidToGoto = e.target.dataset.pid;
+
+        // goto the playlist
+        window.location = this.showPlaylistPath + pidToGoto;
     }
 }
 
