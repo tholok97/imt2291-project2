@@ -48,6 +48,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
+        <!-- API get is subscribed -->
+        <iron-ajax
+            id="subscribeAjax"
+            with-credentials="true"
+            url="[[subscribeURL]]?pid=[[playlist.pid]]"
+            method="get"
+            handle-as="json"
+            on-response="handleSubscribeResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
 
 
         <div class="card">
@@ -68,7 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template is="dom-if" if="[[isLoggedIn(user)]]">
 
                 <template is="dom-if" if="[[!isSubscribed]]">
-                    <paper-button on-click="subscribeButtonOnClick">Abnonner på spillelisten</paper-button>
+                    <paper-button on-click="subscribeButtonOnClick">Abonner på spillelisten</paper-button>
                 </template>
 
                 <template is="dom-if" if="[[isSubscribed]]">
@@ -127,6 +138,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/isSubscribed.php'
                     },
+                    subscribeURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/subscribe.php'
+                    },
                     playlist: Object,
                     user: {
                         type: Object,
@@ -158,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              * Subscribe currently logged in user to playlist
              */
             subscribeButtonOnClick() {
-            
+                this.$.subscribeAjax.generateRequest();                        
             }
 
             /*
@@ -171,7 +186,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             handleIsSubscribedResponse(res) {
                 console.log(res.detail.response);
                 if (res.detail.response.status == 'ok') {
-                    this.isSubscribed = res.detail.response.subscribed;
+                    if (res.detail.response.subscribed == 'true') {
+                        this.isSubscribed = true;
+                    } else {
+                        this.isSubscribed = false;
+                    }
+                    console.log(this.isSubscribed);
+                }
+            }
+
+            handleSubscribeResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.isSubscribed = true;
                 }
             }
 
