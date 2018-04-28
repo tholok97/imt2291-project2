@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../my-components/video-list/video-list.html">
 <link rel="import" href="shared-styles.html">
 
@@ -35,6 +36,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
+        <!-- API get is subscribed -->
+        <iron-ajax
+            auto
+            id="isSubscribedAjax"
+            with-credentials="true"
+            url="[[isSubscribedURL]]?pid=[[playlist.pid]]"
+            method="get"
+            handle-as="json"
+            on-response="handleIsSubscribedResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
 
 
         <div class="card">
@@ -43,8 +56,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <h1>[[playlist.title]]</h1>
 
 
+            <!-- ABONNERINGSKNAPP -->
+            <!--
+            if logged in:
+            - show button if not subscribed
+            - show text if subscribed
+            if not logged in:
+            - show text telling to log in to subscribe
+            -->
+            <h2>Abonneringsstatus</h2>
+            <template is="dom-if" if="[[isLoggedIn(user)]]">
+
+                <template is="dom-if" if="[[!isSubscribed]]">
+                    <paper-button on-click="subscribeButtonOnClick">Abnonner på spillelisten</paper-button>
+                </template>
+
+                <template is="dom-if" if="[[isSubscribed]]">
+                    <i>Du abonnerer på denne spillelisten</i>
+                </template>
+
+            </template>
+
+            <template is="dom-if" if="[[!isLoggedIn(user)]]">
+                <i>Logg inn for å abonnere på denne spillelisten</i>
+            </template>
+
+
+
+
             <!-- placeholders -->
-            <h4>(Abonnoment knapp vil komme her)</h4>
+            <h2>Admin:</h2>
             <h4>(Admin knapp vil komme her)</h4>
 
 
@@ -82,7 +123,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/get.php'
                     },
-                    playlist: Object
+                    isSubscribedURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/isSubscribed.php'
+                    },
+                    playlist: Object,
+                    user: {
+                        type: Object,
+                        value: "waiting"
+                    },
+                    isSubscribed: {
+                        type: Boolean,
+                        value: false
+                    }
                 }
             }
 
@@ -101,6 +154,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            /**
+             * Subscribe currently logged in user to playlist
+             */
+            subscribeButtonOnClick() {
+            
+            }
+
+            /*
+             * is the given user logged in?
+             */
+            isLoggedIn(user) {
+                return user != "waiting" && user != 'notLoggedIn';
+            }
+
+            handleIsSubscribedResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.isSubscribed = res.detail.response.subscribed;
+                }
+            }
 
         }
 
