@@ -20,19 +20,22 @@ $json = json_decode($json_str);
 
 
 // Check if correct information is given:
-if (isset($json->title)                               // If correct variables is given.
-    && isset($json->description)
-    && isset($_FILES['thumbnail'])) {
+if (isset($_POST['title']) && $_POST['title'] != ""   // If correct variables is given.
+    && isset($_POST['description']) && $_POST['description'] != "" ) {
 
+    // Shit temp thumbnail cause why not
+    if (!isset($_POST['thumbnail'])) {
+        $_POST['thumbnail']=00000;
+    }
     if (isset($_SESSION['uid'])) {                              // Check if logged in.
         $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
         if ($user['status'] == "ok" && $user['user']->privilege_level >= 1) {       // Check if logged in user can do this (is teacher or higher).
             $playlistManager = new PlaylistManager(DB::getDBConnection());
             $result = $playlistManager->addPlaylist(                            // Add a new playlist.
-                htmlspecialchars($json->title),
-                htmlspecialchars($json->description),
-                $_FILES['thumbnail']
+                htmlspecialchars($_POST['title']),
+                htmlspecialchars($_POST['description']),
+                $_POST['thumbnail']
             );
     
             $result2 = null;
