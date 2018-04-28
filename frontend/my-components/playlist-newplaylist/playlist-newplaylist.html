@@ -1,4 +1,7 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
 <dom-module id="playlist-newplaylist">
   <template>
@@ -8,6 +11,32 @@
       }
     </style>
     <h2>Hello [[prop1]]!</h2>
+  <div id="uploadForm">
+      <paper-input id="title" label="Tittel" value="{{title}}"></paper-input>
+      <paper-input id="description" label="Beskrivelse" value="{{description}}"></paper-input>
+
+      <canvas id="cv" height="400" width="400"></canvas><br>
+      <paper-button raised on-click="getThumbnail">Velg thumbnail</paper-button>
+      <paper-button raised on-click="upload">Last opp</paper-button>
+
+      <paper-dialog id="setThumbnailDialog">
+        <h2>Sett et bilde som thumbnail</h2>
+        <p>Velg et bilde fra videoen som thumbnail.<br /><br />
+          Spill/Spol igjennom videoen til du er der du vil ha thumbnail, og klikk på knappen "Sett som thumbnail".
+        </p>
+        <video id="player" controls></video>
+        <div class="buttons">
+          <paper-button autofocus dialog-confirm on-click="setThumbnail">Sett som thumbnail</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="resultDialog">
+          <h2>[[responseStatus]].</h2>
+          <p>[[responseMessage]]</p>
+          <div class="buttons">
+            <paper-button autofocus dialog-confirm>OK</paper-button>
+          </div>
+      </paper-dialog>
+    </div>
   </template>
 
   <script>
@@ -23,9 +52,17 @@
       static get is() { return 'playlist-newplaylist'; }
       static get properties() {
         return {
-          prop1: {
+          playlistURL : {
             type: String,
-            value: 'playlist-newplaylist'
+            value: window.Polymer.apiBaseURL+'/playlist/add.php'
+          },
+          title: String,
+          description: String,
+          thumbnail: String,
+          responseMessage: String,
+          responseStatus: {
+            type: String,
+            value: ''
           }
         };
       }
