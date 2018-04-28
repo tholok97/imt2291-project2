@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html"
 
 <dom-module id="video-comments">
   <template>
@@ -7,6 +9,18 @@
         display: block;
       }
     </style>
+
+    <iron-ajax
+    id="getCommentsAjax"
+    with-credentials="true"
+    url="[[getCommentsURL]]"
+    method="get"
+    content-type="application/json"
+    handle-as="json"
+    on-response="handleLoginResponse"
+    last-response="{{response}}"
+    debounce-duration="300"></iron-ajax>
+
     <dom-repeat items="{{comments}}">
       <template>
         <paper-card>
@@ -45,7 +59,22 @@
       * Called when vid changes.
       */
       vidChanged() {
-        
+        this.$.getCommentsAjax.generateRequest();
+      }
+
+      /*
+      * Handle response from API call for getting comments
+      */
+      handleLogoutResponse(res) {
+          console.log("Getting response from ajax");
+          if (res.detail.response.status == 'ok') {
+            for (var i = 0; i < res.detail.response.comments.length; i++) {
+              console.log("Pushing " + i + "'th object to array")
+              this.comments.push(res.detail.response.comments[i]);
+            }
+          }
+          console.log(res.detail.response);   // DEBUG
+          console.log(this.comments)
       }
     }
 
