@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-register">
@@ -41,7 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <h1>Registrer deg!</h1>
 
             <!-- text inputs -->
-            <paper-input id="username" label="Brukernavn" value="{{username}}" type="mail"></paper-input>
+            <paper-input id="username" label="Brukernavn" value="{{username}}" type="email"></paper-input>
             <paper-input id="firstname" label="First name" value="{{firstname}}"></paper-input>
             <paper-input id="lastname" label="Last name" value="{{lastname}}"></paper-input>
             <paper-input id="password" label="Passord" value="{{password}}" type="password"></paper-input>
@@ -58,6 +59,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- register button -->
             <paper-button on-click="register">Registrer deg</paper-button>
 
+            <!-- general dialog -->
+            <paper-dialog id="resultDialog">
+                <h2>[[responseStatus]].</h2>
+                <p>[[responseMessage]]</p>
+                <div class="buttons">
+                    <paper-button autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+
+            <!-- dialog that redirects to root when okay -->
+            <paper-dialog id="registeredDialog">
+                <h2>[[responseStatus]].</h2>
+                <p>[[responseMessage]]</p>
+                <div class="buttons">
+                    <paper-button on-click="gotoHomepage" autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+
         </div>
     </template>
 
@@ -71,7 +90,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'user/add.php'
                     },
+                    username: {
+                        type: String,
+                        value: "",
+                        observer: "_usernameObserver"
+                    },
+                    firstname: {
+                        type: String,
+                        value: ""
+                    },
+                    lastname: {
+                        type: String,
+                        value: ""
+                    },
+                    password: {
+                        type: String,
+                        value: ""
+                    }
                 }
+            }
+
+            /**
+             * run validator every time username changes (to ensure email)
+             */
+            _usernameObserver() {
+                this.$.username.validate();
             }
 
             /**
@@ -80,6 +123,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             register() {
                 console.log("registerer!");
 
+                // check if valid input
+                if (this.username == "" ||
+                    !this.$.username.validate() ||
+                    this.firstname == "" ||
+                    this.lastname == "" ||
+                    this.password == "") {
+
+                    // give message telling bad input
+                    this.responseStatus = "Feil ved inntasting.";
+                    this.responseMessage = "Pass på input. Husk at brukernavn må være mail";
+                    this.$.resultDialog.open();
+
+                    return;
+                }
+
+                // launch request
                 this.$.registerAjax.generateRequest();
             }
 
@@ -88,6 +147,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             handleRegisterResponse(res) {
                 console.log(res.detail.response);
+                if (res.detail.response.status == "ok") {
+                    
+                    this.responseStatus = "Du er registrert!";
+                    this.responseMessage = "Du kan nå logge inn";
+                    this.$.registeredDialog.open();
+
+                } else {
+
+                    this.responseStatus = "Noe gikk galt.."
+                    this.responseMessage = "Melding fra server: " + res.detail.response.message;
+                    this.$.resultDialog.open();
+
+                }
+            }
+
+            gotoHomepage() {
+                window.location = "/";
             }
         }
 
