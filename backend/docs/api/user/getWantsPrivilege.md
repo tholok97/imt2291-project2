@@ -6,6 +6,8 @@ Call by going to "api/user/getWantsPrivilege.php".
 
 You need to be logged in as admin to use this function.
 
+**EDIT**: Added user objects in wants when successfully returns
+
 ##GET-method:
 
 ###Variables:
@@ -27,6 +29,7 @@ Returns JSON.
 
 ####Return example (if not error):
 
+```
 {
     "status": "ok",
     "wants": [
@@ -34,14 +37,29 @@ Returns JSON.
             "0": "1",
             "1": "1",
             "uid": "1",
-            "privilege_level": "1"
+            "privilege_level": "1",
+            "user": {
+                "uid":"1",
+                "username":"test@test",
+                "firstname":"test",
+                "lastname":"test",
+                "privilege_level":"0"
+            }
         },
         {
             "0": "3",
             "1": "1",
             "uid": "3",
-            "privilege_level": "1"
+            "privilege_level": "2"
+            "user": {
+                "uid":"3",
+                "username":"anotheruser@mail",
+                "firstname":"test",
+                "lastname":"test",
+                "privilege_level":"1"
+            }
         }
     ],
     "message": ""
 }
+```

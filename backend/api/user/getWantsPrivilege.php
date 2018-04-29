@@ -20,8 +20,31 @@ if (isset($_SESSION['uid'])) {                               // If correct varia
     $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
     if ($user['status'] == "ok" && $user['user']->privilege_level >= 2) {         // Check if logged in user can do this.
         $result = $userManager->getWantsPrivilege();   // Get info about a user if user exist.
-        
-        echo json_encode($result);                          // Return.
+
+        if ($result['status'] != 'ok') {
+            echo json_encode($result);                          // Return.
+        } else {
+
+            // get user objects of users who want privilege
+            for ($i = 0; $i < count($result['wants']); $i++) {
+                
+                $getUserResult = $userManager->getUser($result['wants'][$i]['uid']);
+
+                if ($getUserResult['status'] == 'ok') {
+
+                    $result['wants'][$i]['user'] = $getUserResult['user'];
+                    
+                } else {
+                    $result['status'] = 'fail';
+                    $result['message'] = $getUserResult['message'];
+                    echo json_encode($result);
+                    exit();
+                }
+            }
+            
+            echo json_encode($result);
+            
+        }
     }
     else {                                                  // If not priviledged enough or not correct uid.
         echo json_encode(array("status" => "fail", "message" => "You are not logged in with a priviledged enough user"));

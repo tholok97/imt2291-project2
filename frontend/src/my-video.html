@@ -10,10 +10,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
-<link rel="import" href="../my-components/video-upload/video-upload.html">
 <link rel="import" href="../my-components/video-comments/video-comments.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
 
-<dom-module id="my-uploadvideo">
+<dom-module id="my-video">
   <template>
     <style include="shared-styles">
       :host {
@@ -24,16 +24,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <video-comments vid="15"></video-comments>
-        <video-upload></video-upload>
+      <h2>Kommentarer:</h2>
+        <video-comments vid=[[vid]] user="{{user}}"></video-comments>
     </div>
   </template>
 
   <script>
-    class MyUploadVideo extends Polymer.Element {
-      static get is() { return 'my-uploadvideo'; }
+    class MyVideo extends Polymer.Element {
+      static get is() { return 'my-video'; }
+      static get properties() {
+        return {
+          subroute: {
+            type: String,
+            value: "",
+            observer: 'subrouteChanged'
+          },
+          vid: Number
+        };
+      }
+
+      /*
+      * Called when vid changes.
+      */
+      subrouteChanged() {
+        console.log("Subroute is " + this.subroute);
+        // Subroute has a leading /, remove that.
+        this.vid = Number(this.subroute.path.substr(1,this.subroute.path.length));
+        console.log("Video id is: " + this.vid);
+      }
     }
 
-    window.customElements.define(MyUploadVideo.is, MyUploadVideo);
+    window.customElements.define(MyVideo.is, MyVideo);
   </script>
 </dom-module>
