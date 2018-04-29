@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../my-components/video-comments/video-comments.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
 
 <dom-module id="my-video">
   <template>
@@ -23,14 +24,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <h2>Comments:</h2>
-        <!--<video-comments></video-comments>-->
+      <h2>Kommentarer:</h2>
+        <video-comments vid=[[vid]] user="{{user}}"></video-comments>
     </div>
   </template>
 
   <script>
     class MyVideo extends Polymer.Element {
       static get is() { return 'my-video'; }
+      static get properties() {
+        return {
+          subroute: {
+            type: String,
+            value: "",
+            observer: 'subrouteChanged'
+          },
+          vid: Number
+        };
+      }
+
+      /*
+      * Called when vid changes.
+      */
+      subrouteChanged() {
+        console.log("Subroute is " + this.subroute);
+        // Subroute has a leading /, remove that.
+        this.vid = Number(this.subroute.path.substr(1,this.subroute.path.length));
+        console.log("Video id is: " + this.vid);
+      }
     }
 
     window.customElements.define(MyVideo.is, MyVideo);
