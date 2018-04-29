@@ -25,7 +25,7 @@ if (isset($json->privilege) && isset($json->uid)) {                             
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
         if ($user['status'] == "ok" && $user['user']->privilege_level >= 2) {         // Check if logged in user can do this.
             $result = $userManager->deletePrivilegeRequest(   // Try to request another privilege to user.
-                htmlspecialchars($json->uid['uid']),
+                htmlspecialchars($json->uid),
                 htmlspecialchars($json->privilege)
             );
             echo json_encode($result);                          // Return.
