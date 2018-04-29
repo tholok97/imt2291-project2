@@ -9,28 +9,145 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-admin">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        This is the admin page
-    </div>
-  </template>
+        <div class="card">
 
-  <script>
-    class MyAdmin extends Polymer.Element {
-      static get is() { return 'my-admin'; }
-    }
+            <!-- promotion-requests area -->
+            <h1>Svar på forfremmelses-forespørsler:</h1>
 
-    window.customElements.define(MyAdmin.is, MyAdmin);
-  </script>
+            <!-- API get wants privilege -->
+            <iron-ajax
+                auto
+                id="wantsPrivilegeAjax"
+                with-credentials="true"
+                url="[[wantsPrivilegeURL]]"
+                method="get"
+                handle-as="json"
+                on-response="handleWantsPrivilegeResponse"
+                last-response="{{response}}"
+                debounce-duration="300"></iron-ajax>
+
+            <ul>
+                <template is="dom-repeat" items="[[wants]]" as="want">
+
+                    <!-- 
+                    the following should really be it's own element,
+                    but written here for simplicity
+                    -->
+                    <div class="card">
+                        <h3>
+
+                            <!-- text to user -->
+                            [[want.user.username]] vil bli
+                            <template is="dom-if" if="[[levelMeansLecturer(want.privilege_level)]]">
+                                foreleser
+                            </template>
+                            <template is="dom-if" if="[[levelMeansAdmin(want.privilege_level)]]">
+                                admin
+                            </template>
+
+                            <!-- accept button -->
+                            <paper-button 
+                                on-click="grantOnClick"
+                                data-uid$="[[want.uid]]" 
+                                data-privlege_level$="[[want.privilege_level]]"
+                                data-grant $="true">
+                                Aksepter
+                            </paper-button>
+
+                            <!-- decline button -->
+                            <paper-button 
+                                on-click="grantOnClick"
+                                data-uid$="[[want.uid]]" 
+                                data-privlege_level$="[[want.privilege_level]]"
+                                data-grant $="false">
+                                Avslå
+                            </paper-button>
+
+                        </h3>
+                    </div>
+                    
+                </template>
+            </ul>
+
+
+            <!-- manual adminification area -->
+            <h1>Gjør bruker til admin manuelt:</h1>
+
+        </div>
+    </template>
+
+    <script>
+        class MyAdmin extends Polymer.Element {
+            static get is() { return 'my-admin'; }
+            static get properties() {
+                return {
+                    wantsPrivilegeURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/getWantsPrivilege.php'
+                    },
+
+                    // contains array of "username" - "privilege" pairs of what users 
+                    // want what privilege, as well as the uid and privilege_level
+                    // to be used in the api call
+                    wants: Array
+                }
+            }
+
+            /**
+             * React to response from api call about wants privilege
+             */ 
+            handleWantsPrivilegeResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+
+                    this.wants = Array();
+
+                    let wants = res.detail.response.wants;
+
+                    // add wants to "wants" property of this object
+                    for (let i = 0; i < wants.length; ++i) {
+                        this.wants.push(wants[i]);
+                    }
+                }
+            }
+
+            /**
+             * does the given privlege_level indicate admin?
+             */ 
+            levelMeansAdmin(level) {
+                return level == "2";
+            }
+
+            /**
+             * does the given privlege_level indicate lecturer?
+             */ 
+            levelMeansLecturer(level) {
+                return level == "1";
+            }
+
+            /**
+             * called when a grant button is clicked (accept / decline)
+             */
+            grantOnClick(e) {
+
+                console.log(e.target.dataset);
+            }
+
+        }
+
+window.customElements.define(MyAdmin.is, MyAdmin);
+    </script>
 </dom-module>
