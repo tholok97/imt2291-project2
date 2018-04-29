@@ -25,13 +25,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <div class="card">
 
+        <!-- API register call -->
+        <iron-ajax
+            id="registerAjax"
+            with-credentials="true"
+            url="[[registerURL]]"
+            method="post"
+            body='{"username": "[[username]]", "password": "[[password]]", "firstname": "[[firstname]]", "lastname": "[[lastname]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleRegisterResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
             <h1>Registrer deg!</h1>
 
             <!-- text inputs -->
-            <paper-input id="username" label="Brukernavn" value="{{username}}"></paper-input>
+            <paper-input id="username" label="Brukernavn" value="{{username}}" type="mail"></paper-input>
             <paper-input id="firstname" label="First name" value="{{firstname}}"></paper-input>
             <paper-input id="lastname" label="Last name" value="{{lastname}}"></paper-input>
-            <paper-input id="password" label="Passord" value="{{password}}"></paper-input>
+            <paper-input id="password" label="Passord" value="{{password}}" type="password"></paper-input>
 
             <h3>Jeg er:</h3>
 
@@ -51,12 +64,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script>
         class MyRegister extends Polymer.Element {
             static get is() { return 'my-register'; }
+            static get properties() {
+                return {
+
+                    registerURL : {                                  
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/add.php'
+                    },
+                }
+            }
 
             /**
              * Register with values from fields
              */ 
             register() {
                 console.log("registerer!");
+
+                this.$.registerAjax.generateRequest();
+            }
+
+            /**
+             * Handle response from register api call
+             */
+            handleRegisterResponse(res) {
+                console.log(res.detail.response);
             }
         }
 

@@ -1,5 +1,5 @@
 <!--
-    Based on code by Øivind Kolloen
+Based on code by Øivind Kolloen
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
@@ -150,25 +150,25 @@ class UserLogin extends Polymer.Element {
     }
 
     /*
-     * is the given user logged in?
-     */
-    isLoggedIn(user) {
-        return user != "waiting" && user != 'notLoggedIn';
-    }
+        * is the given user logged in?
+        */
+        isLoggedIn(user) {
+            return user != "waiting" && user != 'notLoggedIn';
+        }
 
     /*
-     * is the given user in waiting state? (waiting for answer from server)
-     */
-    isWaiting(user) {
-        return user == "waiting" && user != 'notLoggedIn';
-    }
+        * is the given user in waiting state? (waiting for answer from server)
+        */
+        isWaiting(user) {
+            return user == "waiting" && user != 'notLoggedIn';
+        }
 
     /*
-     * Move to the register page
-     */
-    register() {
-        window.location = '/register'; 
-    }
+        * Move to the register page
+        */
+        register() {
+            window.location = '/register'; 
+        }
 
 }
 
