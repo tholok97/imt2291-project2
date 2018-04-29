@@ -58,6 +58,11 @@
                 <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
                 <paper-input type="password" id="password" label="Passord" value="{{password}}"></paper-input>
                 <paper-button raised on-click="login">Logg inn</paper-button>
+
+                <i>eller..</i>
+
+                <paper-button raised on-click="register">Registrer deg</paper-button>
+
             </template>
 
             <!-- shown if user logged in -->
@@ -156,6 +161,13 @@ class UserLogin extends Polymer.Element {
      */
     isWaiting(user) {
         return user == "waiting" && user != 'notLoggedIn';
+    }
+
+    /*
+     * Move to the register page
+     */
+    register() {
+        window.location = '/register'; 
     }
 
 }

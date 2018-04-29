@@ -80,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </template>
 
             <template is="dom-if" if="[[!isLoggedIn(user)]]">
-                <i>Welcome to the "TYK" lecture-sharing system. Log in to customize your experience.</i>
+                <i>Velkommen til "TYK" forelesningssystem. Logg inn for å skreddersy din opplevelse.</i>
             </template>
         </div>
     </template>
@@ -168,6 +168,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             isLoggedIn(user) {
                 return user != "waiting" && user != 'notLoggedIn';
             }
+
+
         }
 
 window.customElements.define(MyHomepage.is, MyHomepage);
