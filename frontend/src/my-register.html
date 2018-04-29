@@ -9,28 +9,57 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-register">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        Dette er register siden
-    </div>
-  </template>
+        <div class="card">
 
-  <script>
-    class MyRegister extends Polymer.Element {
-      static get is() { return 'my-register'; }
-    }
+            <h1>Registrer deg!</h1>
 
-    window.customElements.define(MyRegister.is, MyRegister);
-  </script>
+            <!-- text inputs -->
+            <paper-input id="username" label="Brukernavn" value="{{username}}"></paper-input>
+            <paper-input id="firstname" label="First name" value="{{firstname}}"></paper-input>
+            <paper-input id="lastname" label="Last name" value="{{lastname}}"></paper-input>
+            <paper-input id="password" label="Passord" value="{{password}}"></paper-input>
+
+            <h3>Jeg er:</h3>
+
+            <!-- whoami checkboxes (privilege) -->
+            <paper-radio-group id="iamRadio" selected="student">
+                <paper-radio-button name="student">Student</paper-radio-button>
+                <paper-radio-button name="lecturer">Foreleser</paper-radio-button>
+                <paper-radio-button name="admin">Admin</paper-radio-button>
+            </paper-radio-group>
+
+            <!-- register button -->
+            <paper-button on-click="register">Registrer deg</paper-button>
+
+        </div>
+    </template>
+
+    <script>
+        class MyRegister extends Polymer.Element {
+            static get is() { return 'my-register'; }
+
+            /**
+             * Register with values from fields
+             */ 
+            register() {
+                console.log("registerer!");
+            }
+        }
+
+window.customElements.define(MyRegister.is, MyRegister);
+    </script>
 </dom-module>
