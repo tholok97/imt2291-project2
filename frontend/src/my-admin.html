@@ -39,6 +39,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 last-response="{{response}}"
                 debounce-duration="300"></iron-ajax>
 
+            <!-- API grant privilege -->
+            <iron-ajax
+                id="grantPrivilegeAjax"
+                with-credentials="true"
+                url="[[grantPrivilegeURL]]"
+                method="post"
+                content-type="application/json"
+                handle-as="json"
+                on-response="handleGrantPrivilegeResponse"
+                last-response="{{response}}"
+                debounce-duration="300"></iron-ajax>
+
+            <!-- API deny privilege request -->
+            <iron-ajax
+                id="denyPrivilegeAjax"
+                with-credentials="true"
+                url="[[denyPrivilegeURL]]"
+                method="post"
+                content-type="application/json"
+                handle-as="json"
+                on-response="handleDenyPrivilegeResponse"
+                last-response="{{response}}"
+                debounce-duration="300"></iron-ajax>
+
             <ul>
                 <template is="dom-repeat" items="[[wants]]" as="want">
 
@@ -62,8 +86,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-button 
                                 on-click="grantOnClick"
                                 data-uid$="[[want.uid]]" 
-                                data-privlege_level$="[[want.privilege_level]]"
-                                data-grant $="true">
+                                data-shouldgrant$="true"
+                                data-privilegelevel$="[[want.privilege_level]]">
                                 Aksepter
                             </paper-button>
 
@@ -71,8 +95,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-button 
                                 on-click="grantOnClick"
                                 data-uid$="[[want.uid]]" 
-                                data-privlege_level$="[[want.privilege_level]]"
-                                data-grant $="false">
+                                data-privilegelevel$="[[want.privilege_level]]"
+                                data-shouldgrant$="false">
                                 Avslå
                             </paper-button>
 
@@ -98,10 +122,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'user/getWantsPrivilege.php'
                     },
+                    grantPrivilegeURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/grantAndDeletePrivilegeRequest.php'
+                    },
+                    denyPrivilegeURL : {                                    
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/deletePrivilegeRequest.php'
+                    },
 
-                    // contains array of "username" - "privilege" pairs of what users 
-                    // want what privilege, as well as the uid and privilege_level
-                    // to be used in the api call
+                    // contains array of wants objects to be displayed
                     wants: Array
                 }
             }
@@ -140,11 +170,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             /**
              * called when a grant button is clicked (accept / decline)
+             * Do Launch api call to either grant or deny want
              */
             grantOnClick(e) {
 
-                console.log(e.target.dataset);
+                // prepare variables from dataset
+                let shouldGrant = e.target.dataset.shouldgrant$;    // have to include dollar.. bug??
+                let privilegeLevel = e.target.dataset.privilegelevel;
+                let uid = e.target.dataset.uid;
+
+                if (shouldGrant == 'true') {
+
+                    // launch request to grant
+                    this.$.grantPrivilegeAjax.body = '{"uid": "' + 
+                            uid + '", "privilege": "' + privilegeLevel + '"}';
+
+                    this.$.grantPrivilegeAjax.generateRequest();
+                } else {
+
+                    // launch request to deny
+                    this.$.denyPrivilegeAjax.body = '{"uid": "' + 
+                            uid + '", "privilege": "' + privilegeLevel + '"}';
+
+                    this.$.denyPrivilegeAjax.generateRequest();
+                }
+
             }
+
+            /**
+             * Handle response from grant privilege api call
+             */
+            handleGrantPrivilegeResponse(res) {
+                console.log(res);
+
+                // FOR NOW JUST REDO REQUEST FOR PRIVILEGES.
+                // ignores errors....
+                this.$.wantsPrivilegeAjax.generateRequest();
+            }
+
+            /**
+             * Handle response from grant privilege api call
+             */
+            handleDenyPrivilegeResponse(res) {
+                console.log(res);
+
+                // FOR NOW JUST REDO REQUEST FOR PRIVILEGES.
+                // ignores errors....
+                this.$.wantsPrivilegeAjax.generateRequest();
+            }
+
 
         }
 
