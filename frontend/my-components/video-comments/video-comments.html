@@ -1,0 +1,177 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<dom-module id="video-comments">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <!-- API getComments request: -->
+    <iron-ajax
+      id="getCommentsAjax"
+      auto
+      with-credentials="true"
+      url="[[getCommentsURL]]?vid=[[vid]]"
+      method="get"
+      content-type="application/json"
+      handle-as="json"
+      on-response="handleGetResponse"
+      last-response="{{response}}"
+      debounce-duration="300"></iron-ajax>
+
+      
+
+      <!-- Send a new comment -->
+      <iron-ajax
+      id="sendCommentAjax"
+      with-credentials="true"
+      url="[[sendCommentsURL]]"
+      method="post"
+      body='{"vid": "[[vid]]", "text": "[[commentText]]"}'
+      content-type="application/json"
+      handle-as="json"
+      on-response="handleSendResponse"
+      last-response="{{response}}"
+      debounce-duration="300"></iron-ajax>
+
+
+<!-- If logged in, the user can comment -->
+<template is="dom-if" if="{{isLoggedIn(user)}}">
+  <paper-textarea id="commentTextarea" label="Ny kommentar">{{commentText}}</paper-textarea>
+  <paper-button on-click="sendComment">Send kommentar</paper-button><br />
+</template>
+
+<paper-dialog id="resultDialog">
+  <h2>[[ajaxStatus]].</h2>
+  <p>[[ajaxMessage]]</p>
+  <div class="buttons">
+    <paper-button autofocus dialog-confirm>OK</paper-button>
+  </div>
+</paper-dialog>
+      
+
+    <dom-repeat items="{{comments}}">
+      <template>
+        <paper-card>
+          <div class="card-content">
+            <h3>[[item.userInfo.user.firstname]] [[item.userInfo.user.lastname]]</h3>
+            <b>[[item.timestamp]]</b>
+            <p>[[item.text]]</p>
+          </div>
+        </paper-card>
+        <br /><br />
+      </template>
+    </dom-repeat>
+  </template>
+
+  <script>
+    /**
+     * `video-comments`
+     * Show a videos comments.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class VideoComments extends Polymer.Element {
+      static get is() { return 'video-comments'; }
+      static get properties() {
+        return {
+          vid: {
+            type: Number,
+            value: -1,
+            observer: 'vidChanged'
+          },
+          user: String,                                           // Saving user state inside element (gotten from my-app).
+          commentText: String,                                    // Text of eventually comment to post.
+          comments: Object,
+          getCommentsURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/getComments.php'
+          },
+          sendCommentsURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/comment.php'
+          },
+          ajaxStatus: {                                         // A message based on status column on response from ajax.
+            type: String,
+            value: "Feil"
+          },
+          ajaxMessage: {                                        // A message based on the message-column on response from ajax.
+            type: String,
+            value: ""
+          }
+        };
+      }
+
+      /*
+      * Called when vid changes.
+      */
+      vidChanged() {
+        if (this.vid != -1) {
+          console.log("Video id is " + this.vid);
+          this.$.getCommentsAjax.generateRequest();
+        }
+      }
+
+      /*
+      * Called when user sends in comment.
+      */
+      sendComment() {
+        var comment = this.shadowRoot.querySelector('#commentTextarea').value;      // Need to use querySelector here because of dom-if
+        this.shadowRoot.querySelector('#commentTextarea').value = "";
+        console.log("Called sendComment, comment is " + comment);
+        if (comment != "") {                                                       // We do not wan't to send an empty comment.
+        this.commentText = comment;
+        this.$.sendCommentAjax.generateRequest();                                 // Send comment.
+        }
+      }
+
+    /*
+     * is the given user logged in?
+     */
+     isLoggedIn(user) {
+       console.log("User is: " + user);
+        return user != "waiting" && user != 'notLoggedIn';
+    }
+
+
+      /*
+      * Handle response from API call for getting comments
+      */
+      handleGetResponse(res) {
+          console.log("Getting response from getComment-ajax");
+          if (res.detail.response.status == 'ok') {
+            console.log(res.detail.response.comments);
+            this.comments = res.detail.response.comments;
+          }
+          console.log(res.detail.response);   // DEBUG
+          console.log(this.comments)
+      }
+
+      /*
+      * Handle response from API call for sending a comment
+      */
+      handleSendResponse(res) {
+          console.log("Getting response from comment-ajax");
+          if (res.detail.response.status == 'ok') {
+            this.ajaxStatus = "OK";
+          }
+          else {
+            this.ajaxMessage = res.detail.response.message;
+          }
+          this.$.resultDialog.open();
+          console.log(res.detail.response);   // DEBUG
+      }
+    }
+
+    window.customElements.define(VideoComments.is, VideoComments);
+  </script>
+</dom-module>
