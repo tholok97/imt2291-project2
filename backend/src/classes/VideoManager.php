@@ -48,7 +48,7 @@ class VideoManager {
                 try {
                     $title = htmlspecialchars($title);
                     $description = htmlspecialchars($description);
-                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));
+                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
                     $uid = htmlspecialchars($uid);
                     $topic = htmlspecialchars($topic);
                     $course_code = htmlspecialchars($course_code);
@@ -246,9 +246,9 @@ class VideoManager {
             return $ret;
         }
 
-        // Try to check if uid is the correct id
-
+        
         try {
+            // Try to check if uid is the correct id
             $sql = "SELECT uid FROM video WHERE vid = :vid";
             $sth = $this->db->prepare($sql);
             $sth->bindParam(':vid', $vid);
@@ -260,15 +260,18 @@ class VideoManager {
                 $teacher = $row['uid'];
             }
 
+            $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
+
             // If the person who uploaded video is the one who register, update video-info
             if ($uid == $teacher) {
-                $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code WHERE vid = :vid";
+                $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code, thumbnail = :thumbnail WHERE vid = :vid";
                 $sth = $this->db->prepare ($sql);
                 $sth->bindParam(':title', $title);
                 $sth->bindParam(':description', $description);
                 $sth->bindParam(':topic', $topic);
                 $sth->bindParam(':course_code', $course_code);
                 $sth->bindParam(':vid', $vid);
+                $sth->bindParam(':thumbnail', $thumbnail);
                 $sth->execute();
 
                 if ($sth->rowCount() > 0) {

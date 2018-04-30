@@ -47,4 +47,3 @@ if ($ok) {
 } else {
     echo 'something went wrong..';
 }
-

@@ -16,8 +16,6 @@ session_start();
 
 setApiHeaders("POST");
 
-print_r($_POST);
-
 // Check if correct information is given:
 if (isset($_POST['vid'])
     && isset($_POST['title'])
@@ -29,7 +27,7 @@ if (isset($_POST['vid'])
     if (isset($_SESSION['uid'])) {                                    // If logged in.
         $userManager = new UserManager(DB::getDBConnection());        // Start a new videomanager-instance.
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));  //Get info about user.
-        if ($user['status'] == "ok" && $user['privilege_level'] >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
+        if ($user['status'] == "ok" && $user['user']->privilege_level >= 1) {     // If gotten info about user and users privilege-level is teacher or above.
             $videoManager = new VideoManager(DB::getDBConnection());        // Start a new videomanager-instance.
             if (isset($_FILES['subtitles'])) {                              // If subtitles is set.
                 $result = $videoManager->update(                            // Update video info.
