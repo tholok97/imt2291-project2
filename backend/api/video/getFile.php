@@ -19,7 +19,7 @@ $result = null;
 
 $videoManager = new VideoManager(DB::getDBConnection());
 
-$videoInfo = $videoManager->get(htmlspecialchars($_GET['vid']));
+$videoInfo = $videoManager->get(htmlspecialchars($_GET['vid']),false);      // Get video info, will not increase views because we most likely need to call videomanager->get(..) anotherplace too.
 
 // If ok, output correct output (videofile or subtitle).
 if ($videoInfo['status'] == "ok") {
