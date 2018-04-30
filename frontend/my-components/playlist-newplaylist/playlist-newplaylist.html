@@ -109,6 +109,29 @@
         }
       }
 
+      /**
+       * Set a thumbnail of the frame the player stands on.
+       * 
+       * This code is based on: https://bitbucket.org/okolloen/imt2291-v2018/src/30012325241c1c3826a3d6e596a459937a3a12d1/javascript_lab1/video.html?at=master&fileviewer=file-view-default
+       */
+       setThumbnail() {
+        console.log("Starting setThumbnail")
+        window.URL.revokeObjectURL(this.video_url);
+        var cv = this.$.cv;
+        const ctx = cv.getContext('2d');
+        var player = this.$.player;
+        cv.height = player.videoHeight/2;                                       // Set height
+        cv.width = player.videoWidth/2;                                         // and width of canvas to height and width of video
+
+        ctx.drawImage(player, 0, 0, player.videoWidth/2, player.videoHeight/2);                                          // Draw the currently showing image from the video player on the canvas
+        this.thumbnail = cv.toDataURL();                                      // Get contents of canvas as png image (default)
+        //const form = new FormData();
+        console.log("PNG: " + this.thumbnail);
+        // Can use XMLHttpRequest to send this data to the server
+        // Base64 decode everything after first ","
+      }
+
+
       updateProgress (oEvent) {
         if (oEvent.lengthComputable) {
           var percentComplete = oEvent.loaded / oEvent.total * 100;

@@ -36,30 +36,31 @@ class PlaylistManager {
         $ret['status'] = 'fail';
         $ret['pid'] = null;
         $ret['message'] = "";
-
-        try {
-            
-            $stmt = $this->dbh->prepare('
+        if(sizeof($thumbnail) <= Constants::MAX_FILESIZE_THUMBNAIL) {
+            try {
+                $title = htmlspecialchars($title);
+                $description = htmlspecialchars($description);
+                $stmt = $this->dbh->prepare('
 INSERT INTO playlist (title, description, thumbnail)             
 VALUES (:title, :description, :thumbnail)
-            ');
+                ');
 
-            $stmt->bindParam(':title', $title);
-            $stmt->bindParam(':description', $description);
-            $stmt->bindValue(':thumbnail', getThumbnail($thumbnail));
+                $stmt->bindParam(':title', $title);
+                $stmt->bindParam(':description', $description);
+                $stmt->bindValue(':thumbnail', getThumbnail($thumbnail));
 
-            if ($stmt->execute()) {
+                if ($stmt->execute()) {
 
-                $ret['pid'] = $this->dbh->lastInsertId();
-                $ret['status'] = 'ok';
-            } else {
-                $ret['message'] = "Statement didn't execute correclty";
+                    $ret['pid'] = $this->dbh->lastInsertId();
+                    $ret['status'] = 'ok';
+                } else {
+                    $ret['message'] = "Statement didn't execute correclty";
+                }
+
+            } catch (PDOException $ex) {
+                $ret['message'] = $ex->getMessage();
             }
-
-        } catch (PDOException $ex) {
-            $ret['message'] = $ex->getMessage();
         }
-
         return $ret;
 
     }
