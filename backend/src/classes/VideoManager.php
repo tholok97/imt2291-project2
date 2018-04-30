@@ -48,7 +48,7 @@ class VideoManager {
                 try {
                     $title = htmlspecialchars($title);
                     $description = htmlspecialchars($description);
-                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));
+                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
                     $uid = htmlspecialchars($uid);
                     $topic = htmlspecialchars($topic);
                     $course_code = htmlspecialchars($course_code);
@@ -152,7 +152,7 @@ class VideoManager {
             {
                 $views = htmlspecialchars($row['view_count']) + 1;
                 $ret['status'] = 'ok';
-                $ret['video'] = new Video(htmlspecialchars($row['vid']), htmlspecialchars($row['title']), htmlspecialchars($row['description']), htmlspecialchars('uploadedFiles/'.$row['uid'].'/videos/'.$row['vid']), /*htmlspecialchars($row['thumbnail']),*/ htmlspecialchars($row['uid']), htmlspecialchars($row['topic']), htmlspecialchars($row['course_code']), htmlspecialchars($row['timestamp']), $views, htmlspecialchars($row['mime']), htmlspecialchars($row['size']));
+                $ret['video'] = new Video(htmlspecialchars($row['vid']), htmlspecialchars($row['title']), htmlspecialchars($row['description']), htmlspecialchars('uploadedFiles/'.$row['uid'].'/videos/'.$row['vid']), /*htmlspecialchars($row['thumbnail']),*/ htmlspecialchars($row['uid']), htmlspecialchars($row['topic']), htmlspecialchars($row['course_code']), htmlspecialchars($row['timestamp']), $views, htmlspecialchars($row['mime']), htmlspecialchars($row['size']),htmlspecialchars('uploadedFiles/'.$row['uid'].'/subtitles/'.$row['vid']));
             }
         } catch (PDOException $ex) {
             $ret['errorMessage'] = "Problemer med å bruke databasen, prøv igjen senere eller kontakt administrator.";//$ex->getMessage();
@@ -236,7 +236,7 @@ class VideoManager {
      * @return array[] Returns an associative array with fields 'status' and evt. 'errorMessage' if status is 'fail'.
      */
 
-    function update($vid, $uid, $title, $description, $topic, $course_code) {
+    function update($vid, $uid, $title, $description, $topic, $course_code, $thumbnail, $subtitlesRef) {
         $ret['status'] = 'fail';
         $ret['errorMessage'] = null;
 
@@ -252,9 +252,9 @@ class VideoManager {
             return $ret;
         }
 
-        // Try to check if uid is the correct id
-
+        
         try {
+            // Try to check if uid is the correct id
             $sql = "SELECT uid FROM video WHERE vid = :vid";
             $sth = $this->db->prepare($sql);
             $sth->bindParam(':vid', $vid);
@@ -266,19 +266,32 @@ class VideoManager {
                 $teacher = $row['uid'];
             }
 
+            $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
+
             // If the person who uploaded video is the one who register, update video-info
             if ($uid == $teacher) {
-                $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code WHERE vid = :vid";
+                $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code, thumbnail = :thumbnail WHERE vid = :vid";
                 $sth = $this->db->prepare ($sql);
                 $sth->bindParam(':title', $title);
                 $sth->bindParam(':description', $description);
                 $sth->bindParam(':topic', $topic);
                 $sth->bindParam(':course_code', $course_code);
                 $sth->bindParam(':vid', $vid);
+                $sth->bindParam(':thumbnail', $thumbnail);
                 $sth->execute();
 
                 if ($sth->rowCount() > 0) {
                     $ret['status'] = 'ok';
+                    // Upload subtitles if exist:
+                    if ($subtitlesRef != null) {
+                        if (!file_exists(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles')) {      // The user have not uploaded any subtitles before.
+                            mkdir(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles', 0777, true);
+                        }
+                        if (move_uploaded_file($subtitlesRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$id)) {
+                            $ret['status'] = 'ok';
+                            $ret['vid'] = $id;
+                        }
+                    }
                 }
                 else {
                     $ret['errorMessage'] = "Klarte ikke å oppdatere video-informasjonen. Prøv igjen senere. Vennligst ta kontakt med administrator om problemet vedvarer.";
