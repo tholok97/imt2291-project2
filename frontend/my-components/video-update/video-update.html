@@ -41,7 +41,7 @@
               <p>Velg et bilde fra videoen som thumbnail.<br /><br />
                 Spill/Spol igjennom videoen til du er der du vil ha thumbnail, og klikk på knappen "Sett som thumbnail".
               </p>
-              <video id="player" controls type="{{video.mime}}"></video>
+              <video crossOrigin="Anonymous" id="player" controls type="{{video.mime}}"></video>
               <div class="buttons">
                 <paper-button autofocus dialog-confirm on-click="setThumbnail">Sett som thumbnail</paper-button>
               </div>
@@ -134,7 +134,7 @@
         console.log("Starting getThumbnail(..)");
         //var uploadedVideo = this.$.videoFile.files[0];  //(this.root).querySelector("#videoFile");
         //console.log("File: " + uploadedVideo);
-        var url = window.Polymer.backendBaseURL + this.video.url
+        var url = window.Polymer.apiBaseURL + 'video/getFile.php?type=video&vid=' + this.vid;
         this.$.setThumbnailDialog.open();
         var video =  this.$.player;
         console.log("Video-url: " + url);
