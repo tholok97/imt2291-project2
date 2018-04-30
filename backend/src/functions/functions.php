@@ -86,7 +86,7 @@ function buildWantsPrivilege($userManager) {
 }
 
 function setApiHeaders($method) {
-    header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
+    header("Access-Control-Allow-Origin: ".Config::ACCESS_CONTROL_ALLOW_ORIGIN);
     header("Access-Control-Allow-Methods: ".$method);
     header("Access-Control-Allow-Credentials: true");
     header("Access-Control-Allow-Headers: Origin, Content-Type");

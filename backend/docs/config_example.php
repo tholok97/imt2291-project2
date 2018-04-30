@@ -2,9 +2,9 @@
 
 /**
  * Environment-dependant constants.
+ * Place in backend/.
  */
 class Config {
-
 
 
     /**
@@ -27,4 +27,9 @@ class Config {
      * Path to a test thumbnail image
      */
     const TEST_THUMBNAIL_PATH = "temp/temp.png";
+
+    /**
+     * Access control header for where a 
+     */
+    const ACCESS_CONTROL_ALLOW_ORIGIN = "http://localhost:8081";
 }
