@@ -1,0 +1,106 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../my-components/video-list/video-list.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-updateplaylist">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+
+        <!-- API get playlist -->
+        <iron-ajax
+            auto
+            id="getPlaylistAjax"
+            with-credentials="true"
+            url="[[getPlaylistURL]]?pid=[[pid]]"
+            method="get"
+            handle-as="json"
+            on-response="handleGetPlaylistResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+
+        <div class="card">
+
+            <!-- title -->
+            <h1>Administrer "[[playlist.title]]"</h1>
+
+            <!-- change metainfo -->
+
+            <!-- (adding happens on video page) -->
+
+            <!-- reorder videos -->
+            
+            <!-- delete videos -->
+
+            <!-- add maintainer to playlist -->
+
+            <!-- remove maintainer from playlist -->
+
+        </div>
+    </template>
+
+    <script>
+        class MyUpdatePlaylist extends Polymer.Element {
+            static get is() { return 'my-updateplaylist'; }
+            static get properties() {
+                return {
+                    subroute: {
+                        type: Object,
+                        observer: '_subrouteChanged'
+                    },
+                    pid: Number,
+                    getPlaylistURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/get.php'
+                    },
+                    playlist: Object,
+                    user: {
+                        type: Object,
+                        value: "waiting"
+                    },
+                    isSubscribed: {
+                        type: Boolean,
+                        value: false
+                    }
+                }
+            }
+
+            /**
+             *  Prepare pid on subroute changed
+             */
+            _subrouteChanged() {
+                // path contains a leading /. Remove it and convert to number for pid
+                this.pid = Number(this.subroute.path.substr(1, this.subroute.path.length));
+            }
+
+            handleGetPlaylistResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.playlist = res.detail.response.playlist;
+                }
+            }
+
+
+        }
+
+window.customElements.define(MyUpdatePlaylist.is, MyUpdatePlaylist);
+    </script>
+</dom-module>
