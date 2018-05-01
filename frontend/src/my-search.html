@@ -9,28 +9,76 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
 
+
+<!-- video and playlist lists to display results -->
+<link rel="import" href="../my-components/video-list/video-list.html">
+<link rel="import" href="../my-components/playlist-list/playlist-list.html">
+
 <dom-module id="my-search">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
+        </style>
 
-    <div class="card">
-        This is the search page
-    </div>
-  </template>
+        <div class="card">
 
-  <script>
-    class MySearch extends Polymer.Element {
-      static get is() { return 'my-search'; }
-    }
+            <!-- search bar -->
+            <paper-input label="Søk etter..." value="{{searchString}}"></paper-input>
 
-    window.customElements.define(MySearch.is, MySearch);
-  </script>
+            <!-- checkboxes of what to search in -->
+            <paper-checkbox checked id="tittel">Tittel</paper-checkbox>
+            <paper-checkbox checked id="beskrivelse">Beskrivelse</paper-checkbox>
+            <paper-checkbox checked id="emnekode">Emnekode</paper-checkbox>
+            <paper-checkbox checked id="fornavn">Fornavn</paper-checkbox>
+            <paper-checkbox checked id="etternavn">Etternavn</paper-checkbox>
+
+            <!-- search button -->
+            <paper-button on-click="doSearch">Søk!</paper-button>
+
+
+            <!-- RESULTS -->
+
+            <!-- video results -->
+            <video-list videos="[[videoResults]]"></video-list>
+
+            <!-- playlist results -->
+            <playlist-list playlists="[[playlistResults]]"></playlist-list>
+
+
+        </div>
+    </template>
+
+    <script>
+        class MySearch extends Polymer.Element {
+            static get is() { return 'my-search'; }
+            static get properties() {
+                return {
+                    searchString: {
+                        type: String,
+                        observer: "_onSearchStringChanged"
+                    },
+                    videoResults: Object,
+                    playlistResults: Object
+                }
+            }
+            _onSearchStringChanged() {
+                console.log(this.searchString);
+            }
+
+            doSearch() {
+                console.log("searching");
+            }
+        }
+
+window.customElements.define(MySearch.is, MySearch);
+    </script>
 </dom-module>
