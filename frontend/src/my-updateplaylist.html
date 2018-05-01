@@ -43,16 +43,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <h1>Administrer "[[playlist.title]]"</h1>
 
             <!-- change metainfo -->
+            <h2>Oppdater info:</h2>
+            <paper-input label="Tittel" value="{{newTitle}}"></paper-input>
+            <paper-input label="Description" value="{{newDescription}}"></paper-input>
+            <paper-button on-click="updateInfo">Oppdater</paper-button>
+
+            <!-- VIDEO SECTION -->
+            <h2>Videovalg:</h2>
 
             <!-- (adding happens on video page) -->
+            <i>Å legge til video skjer på den spesifikke videoens side..</i>
 
             <!-- reorder videos -->
+            <h3>Stokk om:</h3>
+            <i>Reordering happens here...</i>
             
             <!-- delete videos -->
+            <h3>Slett video fra spilleliste:</h3>
+            <i>Deleting videos happens here...</i>
+
+            <!-- MAINTAINERS SECTION -->
+
+            <h2>Administratorer:</h2>
+
 
             <!-- add maintainer to playlist -->
+            <h3>Legg til:</h3>
+            <paper-input label="brukernavn" value="{{maintainerToAdd}}"></paper-input>
+            <paper-button on-click="addMaintainer">Legg til</paper-button>
 
             <!-- remove maintainer from playlist -->
+            <h3>Fjerne:</h3>
+            <i>removing maintainer happens here...</i>
 
         </div>
     </template>
@@ -83,6 +105,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            addMaintainer() {
+                console.log("adding maintainer");
+            }
+
+            updateInfo() {
+                console.log("updating info");
+            }
+
             /**
              *  Prepare pid on subroute changed
              */
@@ -95,6 +125,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(res.detail.response);
                 if (res.detail.response.status == 'ok') {
                     this.playlist = res.detail.response.playlist;
+                    this.newTitle = this.playlist.title;
+                    this.newDescription = this.playlist.description;
                 }
             }
 
