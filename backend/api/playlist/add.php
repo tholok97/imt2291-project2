@@ -22,13 +22,10 @@ $json = json_decode($json_str);
 */
 
 // Check if correct information is given:
-if (isset($_POST['title'])          && $_POST['title'] != ""
- && isset($_POST['description'])    && $_POST['description'] != "" ) {     
-    
-    // If there is no thumbnail sent -> apply temp thumbnail
-    if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail'] == "") {
-        $_FILES['thumbnail'] = $config::TEST_THUMBNAIL_PATH;
-    }
+if (isset($_POST['title'])          && $_POST['title']       != ""
+ && isset($_POST['description'])    && $_POST['description'] != "" 
+ && isset($_FILES['thumbnail'])     /*&& $_FILES['thumbnail']  != ""*/) {     
+
     if (isset($_SESSION['uid'])) {                              // Check if logged in.
         $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
@@ -45,7 +42,7 @@ if (isset($_POST['title'])          && $_POST['title'] != ""
             if ($result['status'] == "ok") {
                 $result2 = $playlistManager->addMaintainerToPlaylist(
                     htmlspecialchars($_SESSION['uid']),
-                    htmlspecialchars($_POST['pid'])
+                    htmlspecialchars($result['pid'])
                 );
             }
             
@@ -62,6 +59,6 @@ if (isset($_POST['title'])          && $_POST['title'] != ""
     }
 }
 else {                                              // If not all variables is given, give error.
-    echo json_encode(array("status" => "fail", "message" => "Not all variables/files is given"));
+    echo json_encode(array("status" => "fail", "message" => "Not all variables/files are given"));
 }
 ?>

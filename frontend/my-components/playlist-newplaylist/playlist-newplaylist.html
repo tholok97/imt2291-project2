@@ -60,8 +60,9 @@
       *
       */
       upload() {                                      
-        if (this.title != "" && this.title != undefined        // If filled in required input.
-          && this.description != "" && this.description != undefined) {
+        if (this.title != ""       && this.title != undefined        // If filled in required input.
+         && this.description != "" && this.description != undefined
+         && this.thumbnail != ""   && this.description != undefined) {
             console.log("All needed fields filled in, uploading....");
             const form = new FormData();
             form.append('title', this.title);
@@ -72,7 +73,8 @@
             oReq.onload = function (res) {
               console.log (res.target.responseText);
               var result = JSON.parse(res.target.responseText);
-              if (result.status == "ok") {     // Everything ok.
+              console.log (result.addPlaylist);
+              if (result.addPlaylist.status == "ok" && result.addMaintainer.status == "ok") {     // Everything ok.
                 _this.responseStatus = "Resultat OK";
                 _this.responseMessage = "Spilleliste lagt til";
               }
@@ -88,7 +90,6 @@
             oReq.addEventListener("error", this.transferFailed);
             oReq.addEventListener("abort", this.transferCanceled);
             
-
             oReq.open("POST", this.playlistURL);
             oReq.withCredentials = true;
             oReq.send(form);
@@ -100,12 +101,7 @@
           this.$.resultDialog.open();
         }
       }
-/*
-            oReq.addEventListener("progress", this.updateProgress);
-            oReq.addEventListener("load", this.transferComplete);
-            oReq.addEventListener("error", this.transferFailed);
-            oReq.addEventListener("abort", this.transferCanceled);
-*/ 
+
       updateProgress (oEvent) {
         if (oEvent.lengthComputable) {
           var percentComplete = oEvent.loaded / oEvent.total * 100;
