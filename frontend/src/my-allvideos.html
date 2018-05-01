@@ -56,10 +56,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             handleGetAllVideosResponse(res) {
+                console.log(res.detail.response);
+
+                // push videos in result to this.videos
+                // (video results are nested inside result object, which is why 
+                // we have to do this manual loop)
 
                 this.videos = Array();
-
-                console.log(res.detail.response);
 
                 if (res.detail.response.status == 'ok') {
 
