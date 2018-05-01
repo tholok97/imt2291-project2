@@ -280,22 +280,23 @@ class VideoManager {
                 $sth->bindParam(':thumbnail', $thumbnail);
                 $sth->execute();
 
-                if ($sth->rowCount() > 0) {
+                // Don't check if changed database, because It might be uploading just a file...
+                //if ($sth->rowCount() > 0) {
                     $ret['status'] = 'ok';
                     // Upload subtitles if exist:
                     if ($subtitlesRef != null) {
                         if (!file_exists(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles')) {      // The user have not uploaded any subtitles before.
                             mkdir(dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles', 0777, true);
                         }
-                        if (move_uploaded_file($subtitlesRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$id)) {
+                        if (move_uploaded_file($subtitlesRef['tmp_name'], dirname(__FILE__) . '/../../uploadedFiles/'.$uid.'/subtitles/'.$vid)) {
                             $ret['status'] = 'ok';
-                            $ret['vid'] = $id;
+                            $ret['vid'] = $vid;
                         }
                     }
-                }
+                /*}
                 else {
                     $ret['errorMessage'] = "Klarte ikke å oppdatere video-informasjonen. Prøv igjen senere. Vennligst ta kontakt med administrator om problemet vedvarer.";
-                }
+                }*/
             
                 $teacher;
                 while($row = $sth->fetch(PDO::FETCH_ASSOC))
