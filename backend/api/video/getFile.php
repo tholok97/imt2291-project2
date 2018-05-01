@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '../../../src/classes/DB.php';
 require_once dirname(__FILE__) . '../../../src/classes/VideoManager.php';
 
 //Set headers, which is slightly different than the rest of the api headers, and therefore added here.
-header("Access-Control-Allow-Origin: ".Config::AccessControlAllowOrigin);
+header("Access-Control-Allow-Origin: ".Config::ACCESS_CONTROL_ALLOW_ORIGIN);
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Origin, Content-Type");

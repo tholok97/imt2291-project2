@@ -31,5 +31,6 @@ class Config {
     /**
      * Access control header for where a 
      */
+    const AccessControlAllowOrigin = "http://localhost:8081";
     const ACCESS_CONTROL_ALLOW_ORIGIN = "http://localhost:8081";
 }
