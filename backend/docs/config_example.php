@@ -29,7 +29,7 @@ class Config {
     const TEST_THUMBNAIL_PATH = "temp/temp.png";
 
     /**
-     * Access control header for where a 
+     * Setting route for the Access-Control-Allow-Origin header
      */
     const AccessControlAllowOrigin = "http://localhost:8081";
     const ACCESS_CONTROL_ALLOW_ORIGIN = "http://localhost:8081";
