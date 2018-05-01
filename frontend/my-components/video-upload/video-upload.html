@@ -15,8 +15,8 @@
       <paper-input id="description" label="Beskrivelse" value="{{description}}"></paper-input>
       <paper-input id="topic" label="Tema" value="{{topic}}"></paper-input>
       <paper-input id="course_code" label="Emnekode" value="{{course_code}}"></paper-input>
-      <label id="videoFile">Video som skal lastes opp:</label> <input type="file" name="video" id="videoFile" on-change="getThumbnail"><br />
-      <label id="subtitleFile">Undertekst-fil (valgfri):</label> <input type="file" name="subtitles" id="subtitleFile"><br />
+      <label id="videoFile">Video som skal lastes opp, anbefaler mp4 for compabilitet:</label> <input type="file" name="video" id="videoFile" on-change="getThumbnail"><br />
+      <label id="subtitleFile">Undertekst-fil (valgfri, må være webvtt):</label> <input type="file" name="subtitles" id="subtitleFile"><br />
       
       <canvas id="cv" height="400" width="400"></canvas><br>
       <paper-button raised on-click="getThumbnail">Velg ny thumbnail</paper-button>
@@ -160,8 +160,7 @@
         this.thumbnail = cv.toDataURL();                                      // Get contents of canvas as png image (default)
         //const form = new FormData();
         console.log("PNG: " + this.thumbnail);
-        // Can use XMLHttpRequest to send this data to the server
-        // Base64 decode everything after first ","
+        player.pause();                                                     // Be sure the player is set on pause.
       }
 
 
