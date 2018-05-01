@@ -1,0 +1,140 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../my-components/video-comments/video-comments.html">
+<link rel="import" href="../my-components/video-update/video-update.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="my-video">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <!-- API getComments request: -->
+    <iron-ajax
+    id="getVideoInfoAjax"
+    auto
+    with-credentials="true"
+    url="[[getVideoInfoURL]]?vid=[[vid]]"
+    method="get"
+    content-type="application/json"
+    handle-as="json"
+    on-response="handleGetResponse"
+    last-response="{{response}}"
+    debounce-duration="300"></iron-ajax>
+
+    <paper-dialog id="editDialog">
+        <h2>Rediger videoinformasjon</h2>
+        <paper-dialog-scrollable>
+          <video-update vid=[[vid]]></video-update>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button autofocus dialog-confirm>Lukk vindu</paper-button>
+        </div>
+      </paper-dialog>
+
+    <div class="card">
+      <h1>[[videoInfo.title]]</h1>
+      <!-- TODO: Add video with subtitles element -->
+
+
+      <!-- If logged in and actually has uploaded the video, the user can edit -->
+      <template is="dom-if" if="{{canEdit(user)}}">
+        <paper-button on-click="edit">Rediger</paper-button><br />
+      </template>
+
+
+      <h3>Rating:</h3>
+      <!-- TODO: Add rating element -->
+      <h3>Kommentarer:</h3>
+        <video-comments vid=[[vid]] user="{{user}}"></video-comments>
+    </div>
+  </template>
+
+  <script>
+    class MyVideo extends Polymer.Element {
+      static get is() { return 'my-video'; }
+      static get properties() {
+        return {
+          subroute: {
+            type: String,
+            value: "",
+            observer: 'subrouteChanged'
+          },
+          vid: {
+            type: Number,
+            observer: 'vidChanged'
+          },
+          videoInfo: Object,
+          getVideoInfoURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/get.php'
+          }
+        };
+      }
+
+      /*
+      * Called when subroute changes.
+      */
+      subrouteChanged() {
+        console.log("Subroute is " + this.subroute);
+        // Subroute has a leading /, remove that.
+        this.vid = Number(this.subroute.path.substr(1,this.subroute.path.length));
+        console.log("Video id is: " + this.vid);
+      }
+
+      /*
+      * Called when vid changes.
+      */
+      vidChanged() {
+        console.log("Video id is: " + this.vid);
+        this.$.getVideoInfoAjax.generateRequest();
+      }
+
+      /*
+      * Handle response from API call for getting comments
+      */
+      handleGetResponse(res) {
+          console.log("Getting response from getVideoInfo-ajax");
+          if (res.detail.response.status == 'ok') {
+            console.log(res.detail.response.video);
+            this.videoInfo = res.detail.response.video;
+          }
+          console.log(res.detail.response);   // DEBUG
+          console.log(this.videoInfo);
+      }
+
+      /*
+      * Check if the logged in user can edit
+      * IN debug, now just checks for logged in generally, will be edited.
+      */
+      canEdit(user) {
+        return user != "waiting" && user != 'notLoggedIn';
+      }
+
+      edit() {
+        this.$.editDialog.open();
+      }
+
+    }
+
+    window.customElements.define(MyVideo.is, MyVideo);
+  </script>
+</dom-module>

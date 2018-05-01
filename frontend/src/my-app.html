@@ -36,6 +36,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="my-homepage.html">
 <link rel="lazy-import" href="my-view404.html">
 <link rel="lazy-import" href="my-showplaylist.html">
+<link rel="lazy-import" href="my-video.html">
+
 
 <dom-module id="my-app">
     <template>
@@ -161,8 +163,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <my-allplaylists name="allplaylists"></my-allplaylists>
                     <my-admin name="admin"></my-admin>
                     <my-homepage name="homepage" user="[[user]]"></my-homepage>
+                    <my-video name="video" subroute={{subroute}} user={{user}}></my-video>
                     <my-view404 name="view404"></my-view404>
                     <my-showplaylist user="[[user]]" name="showplaylist" subroute="[[subroute]]"></my-showplaylist>
+                    <my-register name="register"></my-register>
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
@@ -218,7 +222,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 _routePageChanged(page) {
                                     // If no page was found in the route data, page will be an empty string.
                                     // Default to 'view1' in that case.
-                                    this.page = page || 'view1';
+                                    this.page = page || 'homepage';
 
                                     // Close a non-persistent drawer when the page & route are changed.
                                     if (!this.$.drawer.persistent) {

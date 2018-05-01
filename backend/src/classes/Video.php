@@ -13,6 +13,7 @@ class Video {
     public $title;
     public $description;
     public $url;
+    public $subtitlesUrl;
     /*public $thumbnail;*/
     public $uid;
     public $topic;
@@ -37,8 +38,9 @@ class Video {
      * @param int $view_count - how many views of the video
      * @param string $mime - the format the video is in
      * @param int $size 
+     * @param string subtitlesUrl - url to a subtitle file if exist (if not and default is null);
      */
-    public function __construct($vid, $title, $description, $url, /*$thumbnail,*/ $uid, $topic, $course_code, $timestamp, $view_count, $mime, $size) {
+    public function __construct($vid, $title, $description, $url, /*$thumbnail,*/ $uid, $topic, $course_code, $timestamp, $view_count, $mime, $size, $subtitlesUrl = null) {
         $this->vid = $vid;
         $this->title = $title;
         $this->description = $description;
@@ -51,5 +53,6 @@ class Video {
         $this->view_count = $view_count;
         $this->mime = $mime;
         $this->size = $size;
+        $this->subtitlesUrl = $subtitlesUrl;
     }
 }

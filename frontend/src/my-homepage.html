@@ -62,17 +62,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
         <div class="card">
-            <h1>Spillelister du abonnerer på:</h1>
-            <playlist-list playlists="[[subscribedPlaylists]]"></playlist-list>
 
-            <template is="dom-if" if="[[isLecturer]]">
+            <template is="dom-if" if="[[isLoggedIn(user)]]">
 
-                <h1>Videoer du har lastet opp:</h1>
-                <video-list videos="[[ownedVideos]]"></video-list>
+                <h1>Spillelister du abonnerer på:</h1>
+                <playlist-list playlists="[[subscribedPlaylists]]"></playlist-list>
 
-                <h1>Spillelister du administrerer:</h1>
-                <playlist-list playlists="[[maintainsPlaylists]]"></playlist-list>
+                <template is="dom-if" if="[[isLecturer]]">
 
+                    <h1>Videoer du har lastet opp:</h1>
+                    <video-list videos="[[ownedVideos]]"></video-list>
+
+                    <h1>Spillelister du administrerer:</h1>
+                    <playlist-list playlists="[[maintainsPlaylists]]"></playlist-list>
+
+                </template>
+            </template>
+
+            <template is="dom-if" if="[[!isLoggedIn(user)]]">
+                <i>Velkommen til "TYK" forelesningssystem. Logg inn for å skreddersy din opplevelse.</i>
             </template>
         </div>
     </template>
@@ -153,6 +161,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 console.log(this.ownedVideos);
             }
+
+            /*
+             * is the given user logged in?
+             */
+            isLoggedIn(user) {
+                return user != "waiting" && user != 'notLoggedIn';
+            }
+
+
         }
 
 window.customElements.define(MyHomepage.is, MyHomepage);

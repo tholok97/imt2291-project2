@@ -1,5 +1,5 @@
 <!--
-    Based on code by Øivind Kolloen
+Based on code by Øivind Kolloen
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
@@ -59,6 +59,11 @@
                 <paper-input id="uname" label="Brukernavn" value="{{username}}"></paper-input>
                 <paper-password-input id="password" label="Passord" value="{{password}}"></paper-password-input>>
                 <paper-button raised on-click="login">Logg inn</paper-button>
+
+                <i>eller..</i>
+
+                <paper-button raised on-click="register">Registrer deg</paper-button>
+
             </template>
 
             <!-- shown if user logged in -->
@@ -146,18 +151,25 @@ class UserLogin extends Polymer.Element {
     }
 
     /*
-     * is the given user logged in?
-     */
-    isLoggedIn(user) {
-        return user != "waiting" && user != 'notLoggedIn';
-    }
+        * is the given user logged in?
+        */
+        isLoggedIn(user) {
+            return user != "waiting" && user != 'notLoggedIn';
+        }
 
     /*
-     * is the given user in waiting state? (waiting for answer from server)
-     */
-    isWaiting(user) {
-        return user == "waiting" && user != 'notLoggedIn';
-    }
+        * is the given user in waiting state? (waiting for answer from server)
+        */
+        isWaiting(user) {
+            return user == "waiting" && user != 'notLoggedIn';
+        }
+
+    /*
+        * Move to the register page
+        */
+        register() {
+            window.location = '/register'; 
+        }
 
 }
 

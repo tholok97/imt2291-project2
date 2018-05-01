@@ -1,6 +1,6 @@
 <?php
 /**
- * This script is used for adding a new user to the system.
+ * This script is used for granting privilege to a user
  * If called with method POST and correct variables (see docs), you can log in on the ststem.
  */
 
@@ -29,8 +29,7 @@ if (isset($json->privilege) && isset($json->uid)) {                             
                 htmlspecialchars($json->privilege)
             );
             echo json_encode($result);                          // Return.
-        }
-        else {                                                  // If not priviledged enough or not correct uid.
+        } else {                                                  // If not priviledged enough or not correct uid.
             echo json_encode(array("status" => "fail", "message" => "You are not logged in with a priviledged enough user"));
         }
     }

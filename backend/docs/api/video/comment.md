@@ -9,7 +9,6 @@ You need to be logged in to use this function.
 ###JSON-variables:
 {
     "vid": The id of our video.
-    "uid": The id of the user who uploaded it.
     "text": The comment user wrote.
 }
 

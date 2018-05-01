@@ -1,6 +1,6 @@
 <?php
 /**
- * This script is used for adding a new user to the system.
+ * This script is used for granting and deleting a privilege request
  * If called with method POST and correct variables (see docs), you can log in on the ststem.
  */
 
@@ -24,11 +24,38 @@ if (isset($json->privilege) && isset($json->uid)) {                             
         $userManager = new UserManager(DB::getDBConnection());        // Start a new usermanager-instance.
         $user = $userManager->getUser(htmlspecialchars($_SESSION['uid']));      // Get info about logged in user.
         if ($user['status'] == "ok" && $user['user']->privilege_level >= 2) {         // Check if logged in user can do this.
-            $result = $userManager->deletePrivilegeRequest(   // Try to request another privilege to user.
+            $result = $userManager->grantPrivilege(                             // Try to request another privilege to user.
                 htmlspecialchars($json->uid),
                 htmlspecialchars($json->privilege)
             );
-            echo json_encode($result);                          // Return.
+
+            if ($result['status'] != 'ok') {
+                echo json_encode($result);                          // Return.
+            } else {
+
+                // delete privilege since now granted
+                
+                $delete_response = $userManager->deletePrivilegeRequest(
+                    $json->uid,
+                    $json->privilege
+                );
+
+                // if could delete, return earlier result
+                if ($delete_response == 'ok') {
+                    echo json_encode($result);                          // Return.
+
+                // if couldn't, return fail
+                } else {
+                    
+                    $result['status'] = 'fail';
+                    $result['message'] = $delete_response['message'];
+
+                    echo json_encode($result);                          // Return.
+                }
+
+            }
+
+
         }
         else {                                                  // If not priviledged enough or not correct uid.
             echo json_encode(array("status" => "fail", "message" => "You are not logged in with a priviledged enough user"));

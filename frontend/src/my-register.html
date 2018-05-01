@@ -1,0 +1,172 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-register">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+        <div class="card">
+
+        <!-- API register call -->
+        <iron-ajax
+            id="registerAjax"
+            with-credentials="true"
+            url="[[registerURL]]"
+            method="post"
+            body='{"username": "[[username]]", "password": "[[password]]", "firstname": "[[firstname]]", "lastname": "[[lastname]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleRegisterResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <h1>Registrer deg!</h1>
+
+            <!-- text inputs -->
+            <paper-input id="username" label="Brukernavn" value="{{username}}" type="email"></paper-input>
+            <paper-input id="firstname" label="First name" value="{{firstname}}"></paper-input>
+            <paper-input id="lastname" label="Last name" value="{{lastname}}"></paper-input>
+            <paper-input id="password" label="Passord" value="{{password}}" type="password"></paper-input>
+
+            <h3>Jeg er:</h3>
+
+            <!-- whoami checkboxes (privilege) -->
+            <paper-radio-group id="iamRadio" selected="student">
+                <paper-radio-button name="student">Student</paper-radio-button>
+                <paper-radio-button name="lecturer">Foreleser</paper-radio-button>
+                <paper-radio-button name="admin">Admin</paper-radio-button>
+            </paper-radio-group>
+
+            <!-- register button -->
+            <paper-button on-click="register">Registrer deg</paper-button>
+
+            <!-- general dialog -->
+            <paper-dialog id="resultDialog">
+                <h2>[[responseStatus]].</h2>
+                <p>[[responseMessage]]</p>
+                <div class="buttons">
+                    <paper-button autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+
+            <!-- dialog that redirects to root when okay -->
+            <paper-dialog id="registeredDialog">
+                <h2>[[responseStatus]].</h2>
+                <p>[[responseMessage]]</p>
+                <div class="buttons">
+                    <paper-button on-click="gotoHomepage" autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+
+        </div>
+    </template>
+
+    <script>
+        class MyRegister extends Polymer.Element {
+            static get is() { return 'my-register'; }
+            static get properties() {
+                return {
+
+                    registerURL : {                                  
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/add.php'
+                    },
+                    username: {
+                        type: String,
+                        value: "",
+                        observer: "_usernameObserver"
+                    },
+                    firstname: {
+                        type: String,
+                        value: ""
+                    },
+                    lastname: {
+                        type: String,
+                        value: ""
+                    },
+                    password: {
+                        type: String,
+                        value: ""
+                    }
+                }
+            }
+
+            /**
+             * run validator every time username changes (to ensure email)
+             */
+            _usernameObserver() {
+                this.$.username.validate();
+            }
+
+            /**
+             * Register with values from fields
+             */ 
+            register() {
+                console.log("registerer!");
+
+                // check if valid input
+                if (this.username == "" ||
+                    !this.$.username.validate() ||
+                    this.firstname == "" ||
+                    this.lastname == "" ||
+                    this.password == "") {
+
+                    // give message telling bad input
+                    this.responseStatus = "Feil ved inntasting.";
+                    this.responseMessage = "Pass på input. Husk at brukernavn må være mail";
+                    this.$.resultDialog.open();
+
+                    return;
+                }
+
+                // launch request
+                this.$.registerAjax.generateRequest();
+            }
+
+            /**
+             * Handle response from register api call
+             */
+            handleRegisterResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == "ok") {
+                    
+                    this.responseStatus = "Du er registrert!";
+                    this.responseMessage = "Du kan nå logge inn";
+                    this.$.registeredDialog.open();
+
+                } else {
+
+                    this.responseStatus = "Noe gikk galt.."
+                    this.responseMessage = "Melding fra server: " + res.detail.response.message;
+                    this.$.resultDialog.open();
+
+                }
+            }
+
+            gotoHomepage() {
+                window.location = "/";
+            }
+        }
+
+window.customElements.define(MyRegister.is, MyRegister);
+    </script>
+</dom-module>
