@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             with-credentials="true"
             url="[[registerURL]]"
             method="post"
-            body='{"username": "[[username]]", "password": "[[password]]", "firstname": "[[firstname]]", "lastname": "[[lastname]]"}'
+            body='{"username": "[[username]]", "password": "[[password]]", "firstname": "[[firstname]]", "lastname": "[[lastname]]", "privilege": [[wantedPrivilege]]}'
             content-type="application/json"
             handle-as="json"
             on-response="handleRegisterResponse"
@@ -50,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <h3>Jeg er:</h3>
 
             <!-- whoami checkboxes (privilege) -->
-            <paper-radio-group id="iamRadio" selected="student">
+            <paper-radio-group id="iamRadio" selected="student" on-click="onIAmChanged">
                 <paper-radio-button name="student">Student</paper-radio-button>
                 <paper-radio-button name="lecturer">Foreleser</paper-radio-button>
                 <paper-radio-button name="admin">Admin</paper-radio-button>
@@ -88,7 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                     registerURL : {                                  
                         type: String,
-                        value: window.Polymer.apiBaseURL+'user/add.php'
+                        value: window.Polymer.apiBaseURL+'user/addWithPrivilegeRequest.php'
                     },
                     username: {
                         type: String,
@@ -106,7 +106,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     password: {
                         type: String,
                         value: ""
+                    },
+                    wantedPrivilege: {
+                        type: Number,
+                        value: 0
                     }
+                }
+            }
+            
+            onIAmChanged() {
+                console.log("checkboxes changed");
+                switch (this.$.iamRadio.selected) {
+                    case 'student':
+                        this.wantedPrivilege = 0;
+                        break;
+                    case 'lecturer':
+                        this.wantedPrivilege = 1;
+                        break;
+                    case 'admin':
+                        this.wantedPrivilege = 2;
+                        break;
+                    default:
+                        console.log("unknown iamRadio in switch..");
+                        break;
                 }
             }
 
