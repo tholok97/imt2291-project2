@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../my-components/video-comments/video-comments.html">
 <link rel="import" href="../my-components/video-update/video-update.html">
+<link rel="import" href="../my-components/video-rating/video-rating.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -56,13 +57,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
       <!-- If logged in and actually has uploaded the video, the user can edit -->
-      <template is="dom-if" if="{{canEdit(user)}}">
-        <paper-button on-click="edit">Rediger</paper-button><br />
+      <template is="dom-if" if="{{canEdit(user, videoInfo)}}">
+        <paper-button on-click="edit">Rediger video</paper-button><br />
       </template>
 
 
       <h3>Rating:</h3>
-      <!-- TODO: Add rating element -->
+      <video-rating vid=[[vid]] user="{{user}}"></video-rating>
+
       <h3>Kommentarer:</h3>
         <video-comments vid=[[vid]] user="{{user}}"></video-comments>
     </div>
@@ -125,8 +127,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       * Check if the logged in user can edit
       * IN debug, now just checks for logged in generally, will be edited.
       */
-      canEdit(user) {
-        return user != "waiting" && user != 'notLoggedIn';
+      canEdit(user, video) {
+        console.log(user)
+        return user != "waiting" && user != 'notLoggedIn' && user.uid == video.uid;
       }
 
       edit() {

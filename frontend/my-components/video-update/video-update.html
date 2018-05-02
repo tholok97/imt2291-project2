@@ -97,7 +97,10 @@
             value: "",
             notify: true
           },
-          thumbnail: String,
+          thumbnail: {
+            type: String,
+            value: null
+          },
           isParamsReady: {                // Be sure we have parameters ready (vid for example), before doing ajax.
             type: Boolean,
             value: false
@@ -233,7 +236,7 @@
             img.onload = function() {
               ctx.drawImage(img, 0, 0);
             };
-            img.src = window.Polymer.apiBaseURL + "video/getThumbnail.php?vid=" + this.vid;
+            img.src = window.Polymer.apiBaseURL + "video/getThumbnail.php?vid=" + this.vid;         // Set current image.
         }
         console.log(res.detail.response);  //
         console.log("Video-object:" + this.video);

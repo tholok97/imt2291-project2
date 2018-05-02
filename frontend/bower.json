@@ -25,7 +25,8 @@
     "paper-button": "PolymerElements/paper-button#^2.1.0",
     "paper-spinner": "PolymerElements/paper-spinner#^2.1.0",
     "paper-card": "PolymerElements/paper-card#^2.1.0",
-    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.4"
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.4",
+    "star-rating": "greenyouse/star-rating#^2.0.2"
   },
   "resolutions": {
     "polymer": "^2.0.0"

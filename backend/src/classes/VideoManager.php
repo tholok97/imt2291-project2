@@ -266,19 +266,32 @@ class VideoManager {
                 $teacher = $row['uid'];
             }
 
-            $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
-
             // If the person who uploaded video is the one who register, update video-info
             if ($uid == $teacher) {
-                $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code, thumbnail = :thumbnail WHERE vid = :vid";
-                $sth = $this->db->prepare ($sql);
-                $sth->bindParam(':title', $title);
-                $sth->bindParam(':description', $description);
-                $sth->bindParam(':topic', $topic);
-                $sth->bindParam(':course_code', $course_code);
-                $sth->bindParam(':vid', $vid);
-                $sth->bindParam(':thumbnail', $thumbnail);
-                $sth->execute();
+                // Is a thumbnail set, set it, if not just set the rest.
+                if ($thumbnail != null && $thumbnail != "null") {
+                    $thumbnail = base64_decode(substr($thumbnail, strpos($thumbnail, ',')));                // Decode back to image.
+                    $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code, thumbnail = :thumbnail WHERE vid = :vid";
+                    $sth = $this->db->prepare ($sql);
+                    $sth->bindParam(':title', $title);
+                    $sth->bindParam(':description', $description);
+                    $sth->bindParam(':topic', $topic);
+                    $sth->bindParam(':course_code', $course_code);
+                    $sth->bindParam(':vid', $vid);
+                    $sth->bindParam(':thumbnail', $thumbnail);
+                    $sth->execute();
+                }
+                else {
+                    $sql = "UPDATE video SET title = :title, description = :description, topic = :topic, course_code = :course_code WHERE vid = :vid";
+                    $sth = $this->db->prepare ($sql);
+                    $sth->bindParam(':title', $title);
+                    $sth->bindParam(':description', $description);
+                    $sth->bindParam(':topic', $topic);
+                    $sth->bindParam(':course_code', $course_code);
+                    $sth->bindParam(':vid', $vid);
+                    $sth->execute();
+                }
+                
 
                 // Don't check if changed database, because It might be uploading just a file...
                 //if ($sth->rowCount() > 0) {
@@ -473,7 +486,7 @@ class VideoManager {
             }
         }
         else {
-            $ret['errorMessage'] = 'Rating er ikke imellom ' . Constants::RATING_MIN . ' og ' . Constants::RATING_MAX . '.';
+            $ret['errorMessage'] = 'Rating er ikke imellom ' . Constants::RATING_MIN . ' og ' . Constants::RATING_MAX . ', men ' . $rating . '.';
         }
         
 

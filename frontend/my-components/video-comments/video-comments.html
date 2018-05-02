@@ -163,9 +163,10 @@
           console.log("Getting response from comment-ajax");
           if (res.detail.response.status == 'ok') {
             this.ajaxStatus = "OK";
+            this.ajaxMessage = "Kommentar lagt til.";
           }
           else {
-            this.ajaxMessage = res.detail.response.message;
+            this.ajaxMessage = res.detail.response.errorMessage;
           }
           this.$.resultDialog.open();
           console.log(res.detail.response);   // DEBUG
