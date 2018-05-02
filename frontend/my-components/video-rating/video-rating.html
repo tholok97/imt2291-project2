@@ -1,0 +1,203 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/star-rating/star-rating.html">
+
+<dom-module id="video-rating">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+        <!-- API getRating request: -->
+        <iron-ajax
+        id="getRatingAjax"
+        auto
+        with-credentials="true"
+        url="[[getRatingURL]]?vid=[[vid]]"
+        method="get"
+        content-type="application/json"
+        handle-as="json"
+        on-response="handleGetResponse"
+        last-response="{{response}}"
+        debounce-duration="300"></iron-ajax>
+  
+        <!-- API get a 'user's rating if exist'-request: -->
+        <iron-ajax
+        id="getUserRatingAjax"
+        auto
+        with-credentials="true"
+        url="[[getUserRatingURL]]?vid=[[vid]]&uid=[[user.uid]]"
+        method="get"
+        content-type="application/json"
+        handle-as="json"
+        on-response="handleGetUserRatingResponse"
+        last-response="{{response}}"
+        debounce-duration="300"></iron-ajax>
+  
+        <!-- Send a new comment -->
+        <iron-ajax
+        id="sendRatingAjax"
+        with-credentials="true"
+        url="[[sendRatingURL]]"
+        method="post"
+        body='{"vid": "[[vid]]", "rating": "[[myRating]]"}'
+        content-type="application/json"
+        handle-as="json"
+        on-response="handleSendResponse"
+        last-response="{{response}}"
+        debounce-duration="300"></iron-ajax>
+  
+  <!-- If not logged in, the user can not comment, but be shown the rate -->
+  <template is="dom-if" if="{{!canRate(user, userRating.status)}}">
+    Gjennomsnittlig rating: <star-rating id="ratings" rating="{{totalRating}}" votes="[[numberOfRaters]]" details read-only></star-rating><br />
+  </template>
+
+  <!-- If logged in, the user can rate -->
+  <template is="dom-if" if="{{canRate(user, userRating.status)}}">
+    Gjennomsnittlig rating: <star-rating id="ratings" rating="{{totalRating}}" votes="[[numberOfRaters]]" details></star-rating>
+    <paper-button on-click="sendRating">Gi rating (endre verdien i gjennomsnittlig rating)</paper-button><br />
+  </template>
+  
+  <paper-dialog id="resultDialog">
+    <h2>[[ajaxStatus]].</h2>
+    <p>[[ajaxMessage]]</p>
+    <div class="buttons">
+      <paper-button autofocus dialog-confirm>OK</paper-button>
+    </div>
+  </paper-dialog>
+
+  </template>
+
+  <script>
+    /**
+     * `video-rating`
+     * This element deal with rating for a video.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class VideoRating extends Polymer.Element {
+      static get is() { return 'video-rating'; }
+      static get properties() {
+        return {
+          vid: {
+            type: Number,
+            value: -1,
+            observer: 'vidChanged'
+          },
+          user: String,                                           // Saving user state inside element (gotten from my-app).
+          myRating: String,                                       // Users rating.
+          totalRating: {
+            type: Number,
+            value: 0
+          },                                    // The rating gotten when setting all ratings togheter.
+          numberOfRaters: {
+            type: String,
+            value: "0"
+          },                                 // Number of people who rated this video.
+          getRatingURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/getRating.php'
+          },
+          getUserRatingURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/getUserRating.php'
+          },
+          sendRatingURL: {
+            type: String,
+            value: window.Polymer.apiBaseURL+'video/addRating.php'
+          },
+          userRating: {
+            type: Object,
+            value: ""
+          },
+          ajaxStatus: {                                         // A message based on status column on response from ajax.
+            type: String,
+            value: "Feil"
+          },
+          ajaxMessage: {                                        // A message based on the message-column on response from ajax.
+            type: String,
+            value: ""
+          }
+        };
+      }
+      
+      
+      /*
+      * Called when vid changes.
+      */
+      vidChanged() {
+        if (this.vid != -1) {
+          console.log("Video id is " + this.vid);
+          this.$.getRatingAjax.generateRequest();
+        }
+      }
+
+      /*
+      * Called when user sends in rating.
+      */
+      sendRating() {
+        console.log("Called sendRating, rating is " +  this.totalRating);
+        this.myRating = this.totalRating;
+        this.$.sendRatingAjax.generateRequest();                            // Send rating.
+      }
+
+    /*
+     * Is the given user logged in and has not rated video yet?
+     *
+     * If userRating sent in is different than 'fail', the reason is because the user has already rated this video.
+     */
+     canRate(user, userRating) {
+       console.log("Started canRate");
+      return user != "waiting" && user != 'notLoggedIn' && userRating == "fail";
+    }
+
+
+      /*
+      * Handle response from API call for getting total rating
+      */
+      handleGetResponse(res) {
+          console.log("Getting response from getRating-ajax");
+          //if (res.detail.response.status == 'ok') {
+            console.log(res.detail.response.rating);
+            this.totalRating = res.detail.response.rating;
+            this.numberOfRaters = res.detail.response.numberOfRatings;
+          //}
+          console.log(res.detail.response);   // DEBUG
+          console.log("Total ratings response:" + this.totalRating)
+      }
+
+      /*
+      * Handle GetUserRating-response from API call for getting users evt. rating.
+      */
+      handleGetUserRatingResponse(res) {
+          console.log("Getting response from getUserRating-ajax");
+          this.userRating = res.detail.response;
+          console.log(res.detail.response);   // DEBUG
+      }
+
+      /*
+      * Handle response from API call for sending a rating
+      */
+      handleSendResponse(res) {
+          console.log("Getting response from rate-ajax");
+          if (res.detail.response.status == 'ok') {
+            this.ajaxStatus = "OK";
+            this.ajaxMessage = "Du har nå ratet denne videoen."
+          }
+          else {
+            this.ajaxMessage = res.detail.response.errorMessage;
+          }
+          this.$.resultDialog.open();
+          console.log(res.detail.response);   // DEBUG
+          this.$.getRatingAjax.generateRequest();                             // Get rating again so we show correct rating.
+      }
+    }
+
+    window.customElements.define(VideoRating.is, VideoRating);
+  </script>
+</dom-module>
