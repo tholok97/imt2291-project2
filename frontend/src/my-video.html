@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../my-components/video-comments/video-comments.html">
 <link rel="import" href="../my-components/video-update/video-update.html">
+<link rel="import" href="../my-components/video-player/video-player.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -59,6 +60,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template is="dom-if" if="{{canEdit(user)}}">
         <paper-button on-click="edit">Rediger</paper-button><br />
       </template>
+
+      <video-player vid="[[vid]]"></video-player>
 
 
       <h3>Rating:</h3>
