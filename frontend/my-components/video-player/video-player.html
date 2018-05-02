@@ -8,14 +8,19 @@
             }
         </style>
 
-        <video width="300" height="300">
-            <source src="[[videoGetFileURL]]?vid=[[vid]]&type=video">
+        <video id="video" on-click="test" width="640" height="320" controls>
+            <source src="[[videoGetFileURL]]?vid=6&type=video" type="video/mp4">
+            <track id="videoTrack" src="http://localhost/imt2291-project2-api/backend/uploadedFiles/1/subtitles/6"
+            kind="subtitles"
+            srclang="en"
+            label="English_subs">
         </video>
-
 
     </template>
 
+
     <script>
+
         /**
          * `video-player`
          * 
@@ -38,9 +43,17 @@ class VideoPlayer extends Polymer.Element {
             videoGetFileURL: {
                 type: String,
                 value: window.Polymer.apiBaseURL+'video/getFile.php'
-            }
+            },
+            subtitleCues: Array
         };
     }
+
+    test() {
+        console.dir(this.$.videoTrack);
+        console.dir(this.$.video);
+    }
+
+
 }
 
 window.customElements.define(VideoPlayer.is, VideoPlayer);
