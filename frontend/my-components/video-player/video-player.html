@@ -8,7 +8,10 @@
             }
         </style>
 
-        Dette er video-player elementet [[vid]]
+        <video width="300" height="300">
+            <source src="[[videoGetFileURL]]?vid=[[vid]]&type=video">
+        </video>
+
 
     </template>
 
@@ -31,6 +34,10 @@ class VideoPlayer extends Polymer.Element {
             },
             vid: {
                 type: Number
+            },
+            videoGetFileURL: {
+                type: String,
+                value: window.Polymer.apiBaseURL+'video/getFile.php'
             }
         };
     }
