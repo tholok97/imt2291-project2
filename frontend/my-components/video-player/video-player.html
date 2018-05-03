@@ -91,6 +91,9 @@ class VideoPlayer extends Polymer.Element {
     ready() {
         super.ready();
 
+        // hide track
+        this.$.videoTrack.track.mode = "hidden";
+
 
         // on track load -> fill this.subtitleCues with cues
         this.$.videoTrack.addEventListener('load', (e) => {
