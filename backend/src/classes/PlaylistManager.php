@@ -571,7 +571,7 @@ WHERE pid=:pid AND position=:position
                 if (count($rows) > 0) {
                     $entryPos2Vid = $rows[0]['vid'];
                 } else {
-                    $ret['message'] = "No entries for pos1!!";
+                    $ret['message'] = "No entries for pos2!!";
                     return $ret;
                 }
             } else {
