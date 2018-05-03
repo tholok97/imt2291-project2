@@ -4,17 +4,49 @@
     <template>
         <style>
             :host {
-                display: block;
+                display:
+            }
+            #subtitles ul {
+                list-style: none;
+            }
+            #subtitles ul li {
+                padding: 5px;
+            }
+            #subtitles ul li.active {
+                background: lightgrey;
+            }
+            #subtitles {
+                overflow-y: auto;
+                max-height: 480px; 
+            }
+            #container {
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr;
+                grid-template-rows: 1fr;
             }
         </style>
 
-        <video id="video" on-click="test" width="640" height="320" controls>
-            <source src="[[videoGetFileURL]]?vid=6&type=video" type="video/mp4">
-            <track id="videoTrack" src="http://localhost/imt2291-project2-api/backend/uploadedFiles/1/subtitles/6"
-            kind="subtitles"
-            srclang="en"
-            label="English_subs">
-        </video>
+        <div id="container">
+
+            <!-- video with subtitles track loaded from backend -->
+            <video crossorigin="true" id="video" on-click="test" width="640" height="480" controls>
+                <source src="[[videoGetFileURL]]?vid=6&type=video" type="video/mp4">
+                <track id="videoTrack" src="[[videoGetFileURL]]?vid=6&type=subtitle"
+                kind="subtitles"
+                srclang="en"
+                label="English_subs"
+                default>
+            </video>
+
+            <!-- subtitles -->
+            <div id="subtitles">
+                <ul>
+                    <template is="dom-repeat" items="[[subtitleCues]]" as="cue">
+                        <li data-id$="[[cue.id]]" class="active">[[cue.text]]</li>
+                    </template>
+                </ul>
+            </div>
+        </div>
 
     </template>
 
@@ -44,7 +76,10 @@ class VideoPlayer extends Polymer.Element {
                 type: String,
                 value: window.Polymer.apiBaseURL+'video/getFile.php'
             },
-            subtitleCues: Array
+            subtitleCues: {
+                type: Array,
+                value: []
+            }
         };
     }
 
@@ -53,6 +88,47 @@ class VideoPlayer extends Polymer.Element {
         console.dir(this.$.video);
     }
 
+    ready() {
+        super.ready();
+
+
+        // on track load -> fill this.subtitleCues with cues
+        this.$.videoTrack.addEventListener('load', (e) => {
+            console.log("track loaded. filling cue array");
+
+            const trackCues = e.path[0].track.cues;
+
+            for (let i=0; i<trackCues.length; i++) {
+                this.push('subtitleCues', trackCues[i]);
+            }
+
+        });
+
+        // on cue change -> make only currently active cues active
+        this.$.videoTrack.addEventListener('cuechange', e=> {
+
+            // remove active class from all cues
+            this.shadowRoot.querySelectorAll('#subtitles ul li').forEach(li=>{
+                li.classList.remove('active');                       
+            });
+
+            // add active to currently active cues
+            for (let i = 0; i < e.target.track.activeCues.length; i++) {
+                this.shadowRoot.querySelector(`#subtitles li[data-id="${e.target.track.activeCues[i].id}"]`)
+                    .classList.add('active');    
+
+                /*
+                // TODO: WIP
+                let topofcue = this.shadowRoot.querySelector(`#subtitles li[data-id="${e.target.track.activeCues[i].id}"]`).offsetTop;
+                topofcue -= this.shadowRoot.querySelector("#subtitles").scrollHeight/4;
+
+                //let topofcue = this.shadowRoot.querySelector(`#subtitles li[data-id="${e.target.track.activeCues[i].id}"]`).getBoundingClientRect().top;
+                this.shadowRoot.querySelector("#subtitles").scrollTop = topofcue;
+                */
+            }
+        });
+
+    }
 
 }
 
