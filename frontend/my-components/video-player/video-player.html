@@ -30,8 +30,8 @@
 
             <!-- video with subtitles track loaded from backend -->
             <video crossorigin="true" id="video" on-click="test" width="640" height="480" controls>
-                <source src="[[videoGetFileURL]]?vid=6&type=video" type="video/mp4">
-                <track id="videoTrack" src="[[videoGetFileURL]]?vid=6&type=subtitle"
+                <source src="[[videoGetFileURL]]?vid=[[vid]]&type=video" type="video/mp4">
+                <track id="videoTrack" src="[[videoGetFileURL]]?vid=[[vid]]&type=subtitle"
                 kind="subtitles"
                 srclang="en"
                 label="English_subs"
