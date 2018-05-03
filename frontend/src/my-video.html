@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="my-video">
@@ -27,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <!-- API getComments request: -->
+    <!-- API getVideoInfo request: -->
     <iron-ajax
     id="getVideoInfoAjax"
     auto
@@ -39,6 +40,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     on-response="handleGetResponse"
     last-response="{{response}}"
     debounce-duration="300"></iron-ajax>
+
+
+    <!-- Search after playlists -->
+    <iron-ajax
+    id="playlistSearchAjax"
+    with-credentials="true"
+    url="[[playlistSearchURL]]"
+    method="post"
+    body='{"search": "[[playlistToAddString]]", "options": ["title"]}'
+    content-type="application/json"
+    handle-as="json"
+    on-response="handleSearchResponse"
+    last-response="{{response}}"
+    debounce-duration="300"></iron-ajax>
+
+    <!-- Add to playlist -->
+    <iron-ajax
+    id="addToPlaylistAjax"
+    with-credentials="true"
+    url="[[addToPlaylistURL]]"
+    method="post"
+    body='{"vid": "[[vid]]", "pid": "[[playlistToAdd]]"}'
+    content-type="application/json"
+    handle-as="json"
+    on-response="handleSendPlaylistResponse"
+    last-response="{{response}}"
+    debounce-duration="300"></iron-ajax>
+
+    <paper-dialog id="resultDialog">
+        <h2>[[ajaxStatus]].</h2>
+        <p>[[ajaxMessage]]</p>
+        <div class="buttons">
+            <paper-button autofocus dialog-confirm>OK</paper-button>
+        </div>
+    </paper-dialog>
 
     <paper-dialog id="editDialog">
         <h2>Rediger videoinformasjon</h2>
@@ -58,6 +94,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <!-- If logged in and actually has uploaded the video, the user can edit -->
       <template is="dom-if" if="{{canEdit(user)}}">
         <paper-button on-click="edit">Rediger</paper-button><br />
+      </template>
+
+      <!-- If logged in and is lecturer or better, the user can add it to their playlists -->
+      <template is="dom-if" if="{{isLecturer(user)}}">
+          <paper-input label="Spilleliste" value={{playlistToAddString}}></paper-input>
+          <paper-button on-click="addToPlaylist">Legg til spilleliste</paper-button><br />
       </template>
 
 
@@ -82,10 +124,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             observer: 'vidChanged'
           },
+          playlistToAdd: {                          // Which playlist shall we add the video to (if someone tries to add)
+            type: Number,
+            value: 1,
+            observer: 'playlistToAddChanged'
+          },
+          playlistToAddString: {                          // Which playlist shall we add the video to (if someone tries to add)
+            type: String,
+            value: ""
+          },
           videoInfo: Object,
-          getVideoInfoURL: {
+          playlists: Object,
+          playlistsForDropdown: Array,
+          getVideoInfoURL: {                                                  // Get video info.
             type: String,
             value: window.Polymer.apiBaseURL+'video/get.php'
+          },
+          addToPlaylistURL: {                                                  // Add video to playlist-url.
+            type: String,
+            value: window.Polymer.apiBaseURL+'playlist/addVideo.php'
+          },
+          playlistSearchURL: {                                                  // Get playlist search-result.
+            type: String,
+            value: window.Polymer.apiBaseURL+'playlist/search.php'
+          },
+          ajaxStatus: {
+            type: String,
+            value: "Feil"
+          },
+            ajaxMessage: {
+            type: String,
+            value: ""
           }
         };
       }
@@ -108,8 +177,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.getVideoInfoAjax.generateRequest();
       }
 
+      //DEBUG
+      playlistToAddChanged() {
+        console.log("Playlist to add video to is: " + this.playlistToAdd);
+      }
+
+      addToPlaylist() {
+        console.log("Adding video " + this.vid + " to playlist " + this.playlistToAdd)
+        this.$.playlistSearchAjax.generateRequest();
+      }
+
       /*
-      * Handle response from API call for getting comments
+      * Handle response from API call for getting video-info
       */
       handleGetResponse(res) {
           console.log("Getting response from getVideoInfo-ajax");
@@ -122,11 +201,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       /*
+      * Handle response from API call for searching playlists.
+      */
+      handleSearchResponse(res) {
+          console.log("Getting response from getPlaylist-ajax");
+          if (res.detail.response.status == 'ok') {
+            console.log(res.detail.response.playlists);
+            if(res.detail.response.playlists.length == 1) {
+              this.playlistToAdd = res.detail.response.playlists[0].pid;
+              this.$.addToPlaylistAjax.generateRequest();
+            }
+            else {
+              this.ajaxStatus = "Feil";
+              this.ajaxMessage = "Det er flere som heter dette, vennligst skrump inn søket.";
+              this.$.resultDialog.open(); 
+            }
+          }
+          else {
+              this.ajaxStatus = "Feil";
+              this.ajaxMessage = res.detail.response.message;
+              this.$.resultDialog.open(); 
+            }
+          console.log(res.detail.response);   // DEBUG
+      }
+
+      /*
+      * Handle response from API call for sending playlist-response.
+      */
+      handleSendPlaylistResponse(res) {
+        console.log(res.detail.response);
+        if (res.detail.response.status == 'ok') {               // If OK.
+          this.ajaxStatus = "OK";
+          this.ajaxMessage = "Du har nå lagt denne videoen til spillelisten."
+        }
+        else {                                                // If Fail
+          this.ajaxStatus = "Feil";                                                  // If not found user, show message.
+          this.ajaxMessage = res.detail.response.message;       
+        }
+        this.$.resultDialog.open(); 
+      }
+
+      
+      /*
       * Check if the logged in user can edit
       * IN debug, now just checks for logged in generally, will be edited.
       */
       canEdit(user) {
         return user != "waiting" && user != 'notLoggedIn';
+      }
+
+      /*
+      * Check if the logged in user is lecturer or better
+      */
+      isLecturer(user) {
+        return user != "waiting" && user != 'notLoggedIn' && user.privilege_level >= 1;
       }
 
       edit() {

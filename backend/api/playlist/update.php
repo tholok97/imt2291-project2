@@ -52,6 +52,6 @@ if (isset($json->title)                               // If correct variables is
     }
 }
 else {                                              // If not all variables is given, give error.
-    echo json_encode(array("status" => "fail", "message" => "Not all variables/files is given"));
+    echo json_encode(array("status" => "fail", "message" => "Not all variables is given", "json" => $json));
 }
 ?>

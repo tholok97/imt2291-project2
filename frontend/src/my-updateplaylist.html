@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../my-components/video-list/video-list.html">
 <link rel="import" href="shared-styles.html">
 
@@ -36,6 +37,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
+        <!-- API get user-id for user -->
+        <iron-ajax
+            id="getUIDAjax"
+            with-credentials="true"
+            url="[[getUIDURL]]?username=[[maintainerToAdd]]"
+            method="get"
+            handle-as="json"
+            on-response="handleGetUIDResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+
+            <!-- Ajax Add new maintainer -->
+            <iron-ajax
+            id="sendAddMaintainerAjax"
+            with-credentials="true"
+            url="[[addMaintainerURL]]"
+            method="post"
+            body='{"uid": "[[maintainerToAddUID]]", "pid": "[[pid]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleAddMaintainerResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <!-- Ajax Update info -->
+            <iron-ajax
+            id="updateInfoAjax"
+            with-credentials="true"
+            url="[[updateInfoURL]]"
+            method="post"
+            body='{"title": "[[newTitle]]", "pid": "[[pid]]", "description": "[[newDescription]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleUpdateResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <paper-dialog id="resultDialog">
+                <h2>[[ajaxStatus]].</h2>
+                <p>[[ajaxMessage]]</p>
+                <div class="buttons">
+                    <paper-button autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
 
         <div class="card">
 
@@ -45,7 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- change metainfo -->
             <h2>Oppdater info:</h2>
             <paper-input label="Tittel" value="{{newTitle}}"></paper-input>
-            <paper-input label="Description" value="{{newDescription}}"></paper-input>
+            <paper-input label="Beskrivelse" value="{{newDescription}}"></paper-input>
             <paper-button on-click="updateInfo">Oppdater</paper-button>
 
             <!-- VIDEO SECTION -->
@@ -93,7 +139,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/get.php'
                     },
+                    getUIDURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/getUID.php'
+                    },
+                    addMaintainerURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/addMaintainer.php'
+                    },
+                    updateInfoURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/update.php'
+                    },
                     playlist: Object,
+                    maintainerToAdd: String,
+                    maintainerToAddUID: Number,
                     user: {
                         type: Object,
                         value: "waiting"
@@ -101,16 +161,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     isSubscribed: {
                         type: Boolean,
                         value: false
+                    },
+                    ajaxStatus: {
+                        type: String,
+                        value: "Feil"
+                    },
+                    ajaxMessage: {
+                        type: String,
+                        value: ""
                     }
                 }
             }
 
             addMaintainer() {
-                console.log("adding maintainer");
+                console.log("adding maintainer " + this.maintainerToAdd);
+                this.$.getUIDAjax.generateRequest();
             }
 
             updateInfo() {
-                console.log("updating info");
+                console.log("updating info, updated title is '" + this.newTitle + "' and updated description is '" + this.newDescription + "'");
+                this.$.updateInfoAjax.generateRequest();
             }
 
             /**
@@ -130,6 +200,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            /*
+            * Get user id
+            */
+            handleGetUIDResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user.
+                    this.maintainerToAddUID = res.detail.response.uid;
+                    this.$.sendAddMaintainerAjax.generateRequest();         // Add the user as maintainer.
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show message.
+                    this.ajaxMessage = res.detail.response.message;
+                    this.$.resultDialog.open();        
+                }
+            }
+
+
+            /*
+            * Add user as maintainer
+            */
+            handleAddMaintainerResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user, show message about this.
+                    this.ajaxStatus = "OK";
+                    this.ajaxMessage = "Brukeren " + this.maintainerToAdd + " er nå lagt til."
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show error-message.
+                    this.ajaxMessage = res.detail.response.message;
+                }
+                this.$.resultDialog.open();
+            }
+
+            /*
+            *  Update playlist-info 
+            */
+            handleUpdateResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user, show message about this.
+                    this.ajaxStatus = "OK";
+                    this.ajaxMessage = "Playlist er nå oppdatert";
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show error-message.
+                    this.ajaxMessage = res.detail.response.message;
+                }
+                this.$.resultDialog.open();
+            }
 
         }
 

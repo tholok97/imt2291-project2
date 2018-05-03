@@ -25,7 +25,10 @@
     "paper-button": "PolymerElements/paper-button#^2.1.0",
     "paper-spinner": "PolymerElements/paper-spinner#^2.1.0",
     "paper-card": "PolymerElements/paper-card#^2.1.0",
-    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.4"
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.4",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.1.0",
+    "neon-animation": "PolymerElements/neon-animation#^2.2.1",
+    "paper-dropdown-input": "Juravenator/paper-dropdown-input#^2.5.2"
   },
   "resolutions": {
     "polymer": "^2.0.0"
