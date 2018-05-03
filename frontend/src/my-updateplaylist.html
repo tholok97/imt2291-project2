@@ -75,6 +75,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
+            <!-- Add to playlist -->
+            <iron-ajax
+            id="swapVideosAjax"
+            with-credentials="true"
+            url="[[swapVideosURL]]"
+            method="post"
+            body='{"pos1": "[[swapPos1]]", "pos2": "[[swapPos2]]", "pid": "[[pid]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleSwapResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
             <paper-dialog id="resultDialog">
                 <h2>[[ajaxStatus]].</h2>
                 <p>[[ajaxMessage]]</p>
@@ -102,7 +115,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <!-- reorder videos -->
             <h3>Stokk om:</h3>
-            <i>Reordering happens here...</i>
+            <paper-input value={{swapText1}} label="Første video å stokke om"></paper-input>
+            <paper-input value={{swapText2}} label="Andre video å stokke om"></paper-input>
+            <paper-button on-click="swapVideos">Stokk om</paper-button>
             
             <!-- delete videos -->
             <h3>Slett video fra spilleliste:</h3>
@@ -151,7 +166,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: window.Polymer.apiBaseURL+'playlist/update.php'
                     },
+                    swapVideosURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/swapVideo.php'
+                    },
                     playlist: Object,
+                    swapPos1: Number,                                           // Swap position 1
+                    swapPos2: Number,                                           // Swap position 2
+                    swapText1: {                                                // Text for swap 1
+                        type: String,
+                        value: ""
+                    },
+                    swapText2: {                                                // Text for swap 2
+                        type: String,
+                        value: "",
+                        observer: "swapText2Changed"
+                    },
                     maintainerToAdd: String,
                     maintainerToAddUID: Number,
                     user: {
@@ -170,6 +200,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         value: ""
                     }
+                }
+            }
+
+            /*
+            * Check for results and set to swapping if results
+            */
+            swapVideos() {
+                //Zero out:
+                this.swapPos1 = -1;
+                this.swapPos2 = -1;
+
+                // Check validity of pos 1:
+                for(var i = 0; i < this.playlist.videos.length; i++) {               // Go through every part in array.
+                    if (this.swapText1 == this.playlist.videos[i].title) {           // Check if correct title.
+                        this.swapPos1 = i+1;                                           // Set to that ID (+ 1 because db start at 1).
+                    }
+                }
+                
+                // Check validity of pos 2:
+                for(var i = 0; i < this.playlist.videos.length; i++) {               // Go through every part in array.
+                    if (this.swapText2 == this.playlist.videos[i].title) {           // Check if correct title.
+                        this.swapPos2 = i+1;                                         // Set to that ID (+ 1 because db start at 1).
+                    }
+                }
+
+                if (this.swapPos1 != -1 && this.swapPos2 != -1) {                   // Check if found both.
+                    this.$.swapVideosAjax.generateRequest();                        // Swap.
+                }
+                else {
+                    // Find where the error lies to give good feedback.
+                    this.ajaxStatus = "Feil";
+                    if (this.swapPos1 == -1 && this.swapPos2 == -1) {
+                        this.ajaxMessage = "Ingen resultater (verken fra 1. eller 2. input-felt) ga resultater.";
+                    }
+                    else if (this.swapPos1 == -1) {
+                        this.ajaxMessage = "Ingen resultat funnet på første input-felt.";
+                    }
+                    else if (this.swapPos2 == -1) {
+                        this.ajaxMessage = "Ingen resultat funnet på andre input-felt.";
+                    }
+                    this.$.resultDialog.open();
                 }
             }
 
@@ -248,6 +319,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 this.$.resultDialog.open();
             }
+
+        
+
+      /*
+      * Handle response from API call for sending swap-response.
+      */
+      handleSwapResponse(res) {
+        console.log(res.detail.response);
+        if (res.detail.response.status == 'ok') {               // If OK.
+          this.ajaxStatus = "OK";
+          this.ajaxMessage = "Du har nå swappet disse videoene i spillelisten."
+        }
+        else {                                                // If Fail
+          this.ajaxStatus = "Feil";                                                  // If not found user, show message.
+          this.ajaxMessage = res.detail.response.message;       
+        }
+        this.$.resultDialog.open(); 
+      }
 
         }
 
