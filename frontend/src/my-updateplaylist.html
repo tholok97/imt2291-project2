@@ -1,0 +1,345 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../my-components/video-list/video-list.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-updateplaylist">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+
+        <!-- API get playlist -->
+        <iron-ajax
+            auto
+            id="getPlaylistAjax"
+            with-credentials="true"
+            url="[[getPlaylistURL]]?pid=[[pid]]"
+            method="get"
+            handle-as="json"
+            on-response="handleGetPlaylistResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+        <!-- API get user-id for user -->
+        <iron-ajax
+            id="getUIDAjax"
+            with-credentials="true"
+            url="[[getUIDURL]]?username=[[maintainerToAdd]]"
+            method="get"
+            handle-as="json"
+            on-response="handleGetUIDResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+
+            <!-- Ajax Add new maintainer -->
+            <iron-ajax
+            id="sendAddMaintainerAjax"
+            with-credentials="true"
+            url="[[addMaintainerURL]]"
+            method="post"
+            body='{"uid": "[[maintainerToAddUID]]", "pid": "[[pid]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleAddMaintainerResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <!-- Ajax Update info -->
+            <iron-ajax
+            id="updateInfoAjax"
+            with-credentials="true"
+            url="[[updateInfoURL]]"
+            method="post"
+            body='{"title": "[[newTitle]]", "pid": "[[pid]]", "description": "[[newDescription]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleUpdateResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <!-- Add to playlist -->
+            <iron-ajax
+            id="swapVideosAjax"
+            with-credentials="true"
+            url="[[swapVideosURL]]"
+            method="post"
+            body='{"pos1": "[[swapPos1]]", "pos2": "[[swapPos2]]", "pid": "[[pid]]"}'
+            content-type="application/json"
+            handle-as="json"
+            on-response="handleSwapResponse"
+            last-response="{{response}}"
+            debounce-duration="300"></iron-ajax>
+
+            <paper-dialog id="resultDialog">
+                <h2>[[ajaxStatus]].</h2>
+                <p>[[ajaxMessage]]</p>
+                <div class="buttons">
+                    <paper-button autofocus dialog-confirm>OK</paper-button>
+                </div>
+            </paper-dialog>
+
+        <div class="card">
+
+            <!-- title -->
+            <h1>Administrer "[[playlist.title]]"</h1>
+
+            <!-- change metainfo -->
+            <h2>Oppdater info:</h2>
+            <paper-input label="Tittel" value="{{newTitle}}"></paper-input>
+            <paper-input label="Beskrivelse" value="{{newDescription}}"></paper-input>
+            <paper-button on-click="updateInfo">Oppdater</paper-button>
+
+            <!-- VIDEO SECTION -->
+            <h2>Videovalg:</h2>
+
+            <!-- (adding happens on video page) -->
+            <i>Å legge til video skjer på den spesifikke videoens side..</i>
+
+            <!-- reorder videos -->
+            <h3>Stokk om:</h3>
+            <paper-input value={{swapText1}} label="Første video å stokke om"></paper-input>
+            <paper-input value={{swapText2}} label="Andre video å stokke om"></paper-input>
+            <paper-button on-click="swapVideos">Stokk om</paper-button>
+            
+            <!-- delete videos -->
+            <h3>Slett video fra spilleliste:</h3>
+            <i>Deleting videos happens here...</i>
+
+            <!-- MAINTAINERS SECTION -->
+
+            <h2>Administratorer:</h2>
+
+
+            <!-- add maintainer to playlist -->
+            <h3>Legg til:</h3>
+            <paper-input label="brukernavn" value="{{maintainerToAdd}}"></paper-input>
+            <paper-button on-click="addMaintainer">Legg til</paper-button>
+
+            <!-- remove maintainer from playlist -->
+            <h3>Fjerne:</h3>
+            <i>removing maintainer happens here...</i>
+
+        </div>
+    </template>
+
+    <script>
+        class MyUpdatePlaylist extends Polymer.Element {
+            static get is() { return 'my-updateplaylist'; }
+            static get properties() {
+                return {
+                    subroute: {
+                        type: Object,
+                        observer: '_subrouteChanged'
+                    },
+                    pid: Number,
+                    getPlaylistURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/get.php'
+                    },
+                    getUIDURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'user/getUID.php'
+                    },
+                    addMaintainerURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/addMaintainer.php'
+                    },
+                    updateInfoURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/update.php'
+                    },
+                    swapVideosURL: {
+                        type: String,
+                        value: window.Polymer.apiBaseURL+'playlist/swapVideo.php'
+                    },
+                    playlist: Object,
+                    swapPos1: Number,                                           // Swap position 1
+                    swapPos2: Number,                                           // Swap position 2
+                    swapText1: {                                                // Text for swap 1
+                        type: String,
+                        value: ""
+                    },
+                    swapText2: {                                                // Text for swap 2
+                        type: String,
+                        value: "",
+                        observer: "swapText2Changed"
+                    },
+                    maintainerToAdd: String,
+                    maintainerToAddUID: Number,
+                    user: {
+                        type: Object,
+                        value: "waiting"
+                    },
+                    isSubscribed: {
+                        type: Boolean,
+                        value: false
+                    },
+                    ajaxStatus: {
+                        type: String,
+                        value: "Feil"
+                    },
+                    ajaxMessage: {
+                        type: String,
+                        value: ""
+                    }
+                }
+            }
+
+            /*
+            * Check for results and set to swapping if results
+            */
+            swapVideos() {
+                //Zero out:
+                this.swapPos1 = -1;
+                this.swapPos2 = -1;
+
+                // Check validity of pos 1:
+                for(var i = 0; i < this.playlist.videos.length; i++) {               // Go through every part in array.
+                    if (this.swapText1 == this.playlist.videos[i].title) {           // Check if correct title.
+                        this.swapPos1 = i+1;                                           // Set to that ID (+ 1 because db start at 1).
+                    }
+                }
+                
+                // Check validity of pos 2:
+                for(var i = 0; i < this.playlist.videos.length; i++) {               // Go through every part in array.
+                    if (this.swapText2 == this.playlist.videos[i].title) {           // Check if correct title.
+                        this.swapPos2 = i+1;                                         // Set to that ID (+ 1 because db start at 1).
+                    }
+                }
+
+                if (this.swapPos1 != -1 && this.swapPos2 != -1) {                   // Check if found both.
+                    this.$.swapVideosAjax.generateRequest();                        // Swap.
+                }
+                else {
+                    // Find where the error lies to give good feedback.
+                    this.ajaxStatus = "Feil";
+                    if (this.swapPos1 == -1 && this.swapPos2 == -1) {
+                        this.ajaxMessage = "Ingen resultater (verken fra 1. eller 2. input-felt) ga resultater.";
+                    }
+                    else if (this.swapPos1 == -1) {
+                        this.ajaxMessage = "Ingen resultat funnet på første input-felt.";
+                    }
+                    else if (this.swapPos2 == -1) {
+                        this.ajaxMessage = "Ingen resultat funnet på andre input-felt.";
+                    }
+                    this.$.resultDialog.open();
+                }
+            }
+
+            addMaintainer() {
+                console.log("adding maintainer " + this.maintainerToAdd);
+                this.$.getUIDAjax.generateRequest();
+            }
+
+            updateInfo() {
+                console.log("updating info, updated title is '" + this.newTitle + "' and updated description is '" + this.newDescription + "'");
+                this.$.updateInfoAjax.generateRequest();
+            }
+
+            /**
+             *  Prepare pid on subroute changed
+             */
+            _subrouteChanged() {
+                // path contains a leading /. Remove it and convert to number for pid
+                this.pid = Number(this.subroute.path.substr(1, this.subroute.path.length));
+            }
+
+            handleGetPlaylistResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {
+                    this.playlist = res.detail.response.playlist;
+                    this.newTitle = this.playlist.title;
+                    this.newDescription = this.playlist.description;
+                }
+            }
+
+            /*
+            * Get user id
+            */
+            handleGetUIDResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user.
+                    this.maintainerToAddUID = res.detail.response.uid;
+                    this.$.sendAddMaintainerAjax.generateRequest();         // Add the user as maintainer.
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show message.
+                    this.ajaxMessage = res.detail.response.message;
+                    this.$.resultDialog.open();        
+                }
+            }
+
+
+            /*
+            * Add user as maintainer
+            */
+            handleAddMaintainerResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user, show message about this.
+                    this.ajaxStatus = "OK";
+                    this.ajaxMessage = "Brukeren " + this.maintainerToAdd + " er nå lagt til."
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show error-message.
+                    this.ajaxMessage = res.detail.response.message;
+                }
+                this.$.resultDialog.open();
+            }
+
+            /*
+            *  Update playlist-info 
+            */
+            handleUpdateResponse(res) {
+                console.log(res.detail.response);
+                if (res.detail.response.status == 'ok') {               // If found user, show message about this.
+                    this.ajaxStatus = "OK";
+                    this.ajaxMessage = "Playlist er nå oppdatert";
+                }
+                else {
+                    this.ajaxStatus = "Feil";                                                  // If not found user, show error-message.
+                    this.ajaxMessage = res.detail.response.message;
+                }
+                this.$.resultDialog.open();
+            }
+
+        
+
+      /*
+      * Handle response from API call for sending swap-response.
+      */
+      handleSwapResponse(res) {
+        console.log(res.detail.response);
+        if (res.detail.response.status == 'ok') {               // If OK.
+          this.ajaxStatus = "OK";
+          this.ajaxMessage = "Du har nå swappet disse videoene i spillelisten."
+        }
+        else {                                                // If Fail
+          this.ajaxStatus = "Feil";                                                  // If not found user, show message.
+          this.ajaxMessage = res.detail.response.message;       
+        }
+        this.$.resultDialog.open(); 
+      }
+
+        }
+
+window.customElements.define(MyUpdatePlaylist.is, MyUpdatePlaylist);
+    </script>
+</dom-module>

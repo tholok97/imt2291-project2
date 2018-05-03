@@ -48,7 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
-        <!-- API get is subscribed -->
+        <!-- API subscribe -->
         <iron-ajax
             id="subscribeAjax"
             with-credentials="true"
@@ -97,7 +97,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <!-- placeholders -->
             <h2>Admin:</h2>
-            <h4>(Admin knapp vil komme her)</h4>
+            <paper-button on-click="adminPlaylist">Administrer spillelisten</paper-button>
 
 
             <!-- list of maintainers -->
@@ -152,6 +152,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         value: false
                     }
                 }
+            }
+
+            adminPlaylist() {
+
+                // goto updateplaylist/:pid
+                window.location = "/updateplaylist/" + this.pid;
+                
             }
 
             /**
