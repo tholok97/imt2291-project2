@@ -49,8 +49,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             debounce-duration="300"></iron-ajax>
 
 
-            <!-- Ajax Add new maintainer -->
-            <iron-ajax
+        <!-- Ajax Add new maintainer -->
+        <iron-ajax
             id="sendAddMaintainerAjax"
             with-credentials="true"
             url="[[addMaintainerURL]]"
@@ -62,8 +62,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
-            <!-- Ajax Update info -->
-            <iron-ajax
+        <!-- Ajax Update info -->
+        <iron-ajax
             id="updateInfoAjax"
             with-credentials="true"
             url="[[updateInfoURL]]"
@@ -75,8 +75,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
-            <!-- Add to playlist -->
-            <iron-ajax
+        <!-- Add to playlist -->
+        <iron-ajax
             id="swapVideosAjax"
             with-credentials="true"
             url="[[swapVideosURL]]"
@@ -88,13 +88,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{response}}"
             debounce-duration="300"></iron-ajax>
 
-            <paper-dialog id="resultDialog">
-                <h2>[[ajaxStatus]].</h2>
-                <p>[[ajaxMessage]]</p>
-                <div class="buttons">
-                    <paper-button autofocus dialog-confirm>OK</paper-button>
-                </div>
-            </paper-dialog>
+        <paper-dialog id="resultDialog">
+            <h2>[[ajaxStatus]].</h2>
+            <p>[[ajaxMessage]]</p>
+            <div class="buttons">
+               <paper-button autofocus dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
 
         <div class="card">
 

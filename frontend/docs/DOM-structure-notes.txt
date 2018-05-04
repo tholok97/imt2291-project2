@@ -1,0 +1,27 @@
+§
+When N similiar child nodes to one parent, where N>1:
+    
+    <parent> ---- xN ----> <child>
+
+§
+When functionality, attribute, or similiar of a button or other nodetype 
+was deemed necessary to document:
+
+    <nodetype>  on line 1
+    {function}  on line 2, {} every time
+
+§
+General category names describes the content categorically.
+All content is divided into it's relative category.
+
+§
+Names of specialised groups may appear in format:
+    <src-view> | <my-components>
+This is in the cases where the <my-component> responsible for the respective view
+was small enough to fit in without it becoming too messy.
+
+§
+Group naming is based on what is relevant for respective groupings:
+-When relevant it will signify an if-case.
+-It can also signify attribute-name.
+-At other times it tells what the overall purpose is.
