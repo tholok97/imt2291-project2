@@ -11,3 +11,7 @@ Bruk Wikien til deres eget prosjekt til å dokumentere prosjektet slik det er be
 * Kristian Sigtbakken Holm
 * Yngve Hestem
 * Thomas Løkkeborg
+
+## Dokumentasjon
+
+Dokumentasjon finner en i wikien til dette prosjektet. Det ligger og dokumentasjon i `backend/docs` og `frontend/docs`, men alt som ligger der burde også likgge i wikien.
